@@ -112,26 +112,57 @@ static void ClienthandleRegister(int sfd)
 
     std::string msg = email + " " + passwd + " " + name;
 
-    char* cstr = new char[msg.size() + 1];
-
-    if (cstr != nullptr)
-        std::strcpy(cstr, msg.c_str());
 
     sendMsg(sfd, msg.c_str(), msg.size(), REGISTER);
 
+    char* cstr; 
+    Type flag;
+    recvMsg(sfd, &cstr, &flag);
+
+    std::cout << cstr << '\n';
+}
+
+
+static int ClienthandleLogin(int sfd)
+{
+    std::string email;
+    std::string passwd;
+
+    std::cout << "输入账号: ";
+    std::cin >> email;
+
+   std::cout << "输入密码: ";
+
+    termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~ECHO; // 关闭回显
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    std::cin >> passwd;
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
+
+    std::cout << std::endl; // 输出换行
+
+    std::string msg = email + ' ' + passwd;
+
+    sendMsg(sfd, msg.c_str(), msg.size(), LOGIN);
+
+    char* cstr; 
     Type flag;
     recvMsg(sfd, &cstr, &flag);
 
     std::cout << cstr << '\n';
 
-    // 在这里可以继续处理注册逻辑
-    delete [] cstr;
-}
-
-
-static int handleLogin(int sfd)
-{
-
+    if(strcmp(cstr, "登录成功") == 0)
+    {
+        return 1;
+    }
+    else 
+    {
+        return 0;
+    }
 }
 
 static void handleForgetPasswd(int sfd)
@@ -158,7 +189,7 @@ void enterChatroom(int sfd)
         switch (choice)
         {
             case 1: ClienthandleRegister(sfd); break; 
-            case 2: if(handleLogin(sfd) == 1)   
+            case 2: if(ClienthandleLogin(sfd) == 1)   
                         return;
                     break;
             case 3: handleForgetPasswd(sfd); break;

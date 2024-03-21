@@ -51,19 +51,19 @@ int sql_insert(MYSQL* connect, char* email, char* password, char* name)
 int sql_select(MYSQL* connect, const char* email, const char* password) 
 {
     // 构建 SQL 查询语句
-    std::string query = "SELECT 1 FROM users WHERE email='" + std::string(email) + "' AND password='" + std::string(password) + "' LIMIT 1";
+    std::string query = "SELECT 1 FROM accounts WHERE email='" + std::string(email) + "' AND password='" + std::string(password) + "' LIMIT 1";
 
     // 执行 SQL 查询
     if (mysql_query(connect, query.c_str())) {
         std::cerr << "Error querying database: " << mysql_error(connect) << std::endl;
-        return -1; // 查询失败
+        return 0; // 查询失败
     }
 
     // 获取查询结果
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) {
         std::cerr << "Error storing result: " << mysql_error(connect) << std::endl;
-        return -1; // 获取结果失败
+        return 0; // 获取结果失败
     }
 
     // 判断是否有匹配的记录

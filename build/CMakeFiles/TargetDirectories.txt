@@ -1,0 +1,13 @@
+/home/mars/code/chatroom/build/CMakeFiles/chatroom.dir
+/home/mars/code/chatroom/build/CMakeFiles/client.dir
+/home/mars/code/chatroom/build/CMakeFiles/edit_cache.dir
+/home/mars/code/chatroom/build/CMakeFiles/rebuild_cache.dir
+/home/mars/code/chatroom/build/project/server/CMakeFiles/server.dir
+/home/mars/code/chatroom/build/project/server/CMakeFiles/edit_cache.dir
+/home/mars/code/chatroom/build/project/server/CMakeFiles/rebuild_cache.dir
+/home/mars/code/chatroom/build/project/threadpool/CMakeFiles/threadpool.dir
+/home/mars/code/chatroom/build/project/threadpool/CMakeFiles/edit_cache.dir
+/home/mars/code/chatroom/build/project/threadpool/CMakeFiles/rebuild_cache.dir
+/home/mars/code/chatroom/build/project/message/CMakeFiles/message.dir
+/home/mars/code/chatroom/build/project/message/CMakeFiles/edit_cache.dir
+/home/mars/code/chatroom/build/project/message/CMakeFiles/rebuild_cache.dir

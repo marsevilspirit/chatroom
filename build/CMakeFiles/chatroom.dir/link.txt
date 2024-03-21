@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/chatroom.dir/project/main.cc.o -o chatroom  project/server/libserver.a project/threadpool/libthreadpool.a project/message/libmessage.a -lmysqlclient 

@@ -5,6 +5,7 @@
 #define BUF_SIZE 2048
 
 std::mutex mtx; // 互斥量，用于保护标准输出
+int stop = 1;
 
 void errExit(const char* error)
 {
@@ -12,11 +13,13 @@ void errExit(const char* error)
     exit(EXIT_FAILURE);
 }
 
-void sendMessageThread(int sfd) {
+void sendMessageThread(int sfd) 
+{
     char buf[BUF_SIZE];
-    while (true) {
+    while (stop) {
         memset(buf, 0, BUF_SIZE);
-        if (fgets(buf, BUF_SIZE, stdin) == nullptr) {
+        if (fgets(buf, BUF_SIZE, stdin) == nullptr) 
+        {
             printf("Exiting...\n");
             break;
         }
@@ -24,7 +27,8 @@ void sendMessageThread(int sfd) {
         int len = strlen(buf);
         
         // 去除输入内容末尾的换行符
-        if (len > 0 && buf[len-1] == '\n') {
+        if (len > 0 && buf[len-1] == '\n') 
+        {
             buf[len-1] = '\0';
             len--;
         }
@@ -33,22 +37,27 @@ void sendMessageThread(int sfd) {
             continue;
         }
 
-        if (strcmp(buf, "exit") == 0) {
+        if (strcmp(buf, "exit") == 0)
+        {
             printf("Exiting...\n");
+            stop = 0;
             break;
         }
 
-        if (sendMsg(sfd, buf, len, GROUP_MESSAGE) == -1) {
+        if (sendMsg(sfd, buf, len, GROUP_MESSAGE) == -1) 
+        {
             printf("Failed to send message.\n");
             break;
         }
     }
 }
 
-void receiveMessageThread(int sfd) {
+void receiveMessageThread(int sfd) 
+{
     char* buf;
     Type flag;
-    while (true) {
+    while (stop) 
+    {
         int len = recvMsg(sfd, &buf, &flag);
         switch (flag)
         {
@@ -58,10 +67,12 @@ void receiveMessageThread(int sfd) {
             case SERVER_MESSAGE: std::cout << "SERVER_MESSAGE"; break;
             default: std::cout << "UNKNOWN\n"; break;
         }
-        if (len == -1) {
+        if (len == -1) 
+        {
             perror("recv");
             break;
-        } else if (len == 0) {
+        } else if (len == 0) 
+        {
             printf("Server closed the connection.\n");
             break;
         }
@@ -71,13 +82,15 @@ void receiveMessageThread(int sfd) {
     }
 }
 
-int main(void) {
+int main(void) 
+{
 
     int sfd;
     struct sockaddr_in svaddr;
 
     sfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sfd == -1) {
+    if (sfd == -1) 
+    {
         errExit("socket");
     }
 
@@ -86,7 +99,8 @@ int main(void) {
     svaddr.sin_port = htons(PORT_NUM);
     inet_pton(AF_INET, IP, &svaddr.sin_addr);
 
-    if (connect(sfd, (const struct sockaddr*) &svaddr, sizeof(struct sockaddr_in)) == -1) {
+    if (connect(sfd, (const struct sockaddr*) &svaddr, sizeof(struct sockaddr_in)) == -1) 
+    {
         errExit("connect");
     }
 
@@ -101,7 +115,8 @@ int main(void) {
     sendThread.join();
     receiveThread.join();
 
-    if (close(sfd) == 0) {
+    if (close(sfd) == 0) 
+    {
         printf("close success\n");
     }
 

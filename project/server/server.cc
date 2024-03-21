@@ -2,6 +2,8 @@
 #include "../threadpool/threadpool.h"
 #include "../message/message.h"
 
+extern std::unordered_map<int, std::string> hashTable;
+
 static std::string getIpAddress() 
 {
     struct ifaddrs *ifAddrStruct = nullptr;
@@ -102,6 +104,8 @@ void server::handleReceivedMessage(int client_socket)
             client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
         }
 
+        update_online_status(connect, hashTable[client_socket].c_str(), 0);
+
         close(client_socket);
     }
     else if (ret == 0)
@@ -115,6 +119,8 @@ void server::handleReceivedMessage(int client_socket)
             client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
         }
 
+        update_online_status(connect, hashTable[client_socket].c_str(), 0);
+
         close(client_socket);
     }
     else
@@ -124,8 +130,9 @@ void server::handleReceivedMessage(int client_socket)
             case GROUP_MESSAGE: handleGroupMessage(msg, client_socket, client_sockets); break;
             case REGISTER:      ServerhandleRegister(msg, client_socket, connect);      break;
             case LOGIN:         ServerhandleLogin(msg, client_socket, connect);         break;
-            case FORGETPASSWD:                                                          break;
-            case FOUNDPASSWD:                                                           break;
+            case FORGET_PASSWD: ServerhandleForgetPasswd(msg, client_socket, connect);  break;
+            case FOUND_PASSWD:                                                          break;
+            default:            std::cerr << "Unknown message type\n";                  break;
         }
     }
 }
@@ -181,6 +188,9 @@ void server::run()
                         client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
                     }
                     std::cout << "Client disconnected by EPOLLERR | EPOLLHUP: " << events[i].data.fd << '\n';
+
+                    update_online_status(connect, hashTable[events[i].data.fd].c_str(), 0);
+
                     close(events[i].data.fd);
                 }
                 else if(events[i].events & EPOLLIN)//接收信息

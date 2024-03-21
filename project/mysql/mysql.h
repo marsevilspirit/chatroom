@@ -11,3 +11,5 @@ int sql_select(MYSQL* connect, const char* email, const char* password);
 int sql_online(MYSQL* connect, const char* email);
 
 int update_online_status(MYSQL* connect, const char* email, int status);
+
+int update_passwd(MYSQL* connect, const char* email, const char* password);

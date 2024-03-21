@@ -1,5 +1,6 @@
 #include "message.h"
-#include <vector>
+
+std::unordered_map<int, std::string> hashTable;
 
 static int writen(int fd, const char* msg, int size)
 {
@@ -85,14 +86,16 @@ static int readn(int fd, char* buf, int size)
 int recvMsg(int cfd, char** msg, Type* flag)
 {
     int len = 0;
-    if (readn(cfd, (char*)&len, 4) == -1) {
+    if (readn(cfd, (char*)&len, 4) == -1) 
+    {
         return -1; // Error reading length
     }
 
     len = ntohl(len);
 
     int recvFlag = 0;
-    if (readn(cfd, (char*)&recvFlag, 4) == -1) {
+    if (readn(cfd, (char*)&recvFlag, 4) == -1) 
+    {
         return -1; // Error reading flag
     }
 
@@ -194,12 +197,53 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
     else 
         send = "登录失败，账号或密码错误";
 
-    if(update_online_status(connect, email, 1))
+    if(update_online_status(connect, email, 1) == 0)
     {
-        std::cerr << "修改在线状态失败";
+        std::cerr << "修改在线状态失败\n";
         send = "修改在线状态失败";
     }
 
+    hashTable[client_socket] = email;
+
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 
+}
+
+void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
+{
+    std::cout << "new user want to login: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* email = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* password = msg;
+    std::string send;
+
+    if(sql_online(connect, email) == 0)
+    {
+        send = "账号已登录";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    if(update_passwd(connect, email, password) == 0)
+    {
+        send = "密码更新失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "密码更新成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+    
+}
+
+void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
+{
+    
 }

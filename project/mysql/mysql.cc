@@ -75,3 +75,35 @@ int sql_select(MYSQL* connect, const char* email, const char* password)
     // 返回查询结果，1 表示匹配，0 表示不匹配
     return (count > 0) ? 1 : 0;
 }
+
+int sql_online(MYSQL* connect, const char* email)
+{
+    std::string query = "SELECT 1 FROM accounts WHERE email ='" + std::string(email) + "' AND online_status='0' LIMIT 1";
+
+    if (mysql_query(connect, query.c_str())){
+        std::cerr << "Error querying database: " << mysql_error(connect) << std::endl;
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr){
+        std::cerr << "Error storing result: " << mysql_error(connect) << std::endl;
+        return 0;
+    }
+
+    int count = mysql_num_rows(result);
+
+    return (count > 0) ? 1 : 0;
+}
+
+int update_online_status(MYSQL* connect, const char* email, int status) 
+{
+    std::string query = "UPDATE accounts SET online_status = " + std::to_string(status) + " WHERE email = '" + std::string(email) + "'";
+    
+    if (mysql_query(connect, query.c_str())) {
+        std::cerr << "Error updating online status: " << mysql_error(connect) << std::endl;
+        return 0;
+    }
+
+    return 1;
+}

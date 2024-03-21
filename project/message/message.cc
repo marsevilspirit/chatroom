@@ -177,15 +177,28 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
     *msg = '\0';
     msg++;
     char* password = msg;
+    std::string send;
+
+    if(sql_online(connect, email) == 0)
+    {
+        send = "账号已登录";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
 
     bool find = sql_select(connect, email, password);
 
-    std::string send;
 
     if(find)
         send = "登录成功";
     else 
         send = "登录失败，账号或密码错误";
+
+    if(update_online_status(connect, email, 1))
+    {
+        std::cerr << "修改在线状态失败";
+        send = "修改在线状态失败";
+    }
 
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 

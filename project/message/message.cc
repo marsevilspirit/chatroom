@@ -129,34 +129,24 @@ void handleGroupMessage(char* msg, int client_socket, std::vector<int>& client_s
 
 void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
 {
-    std::cout << "New uesr want to register: " << client_socket << '\n';
+    std::cout << "New user want to register: " << client_socket << '\n';
     std::cout << msg <<'\n';
     
     char* email = msg;  
 
-    printf("1\n");
-
     while(*msg != ' ' && *msg != '\0')
         msg++;
-
-    printf("2\n");
 
     *msg = '\0';
     msg++;
     char* password = msg;
 
-    printf("3\n");
-
     while(*msg != ' ' && *msg!= '\0')
         msg++;
-
-    printf("4\n");
 
     *msg = '\0';
     msg++;
     char* name = msg;
-
-    printf("5\n");
 
     std::string send;
 
@@ -174,3 +164,29 @@ void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }
 
+void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
+{
+    std::cout << "new user want to login: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* email = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* password = msg;
+
+    bool find = sql_select(connect, email, password);
+
+    std::string send;
+
+    if(find)
+        send = "登录成功";
+    else 
+        send = "登录失败，账号或密码错误";
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+
+}

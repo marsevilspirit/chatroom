@@ -123,7 +123,7 @@ void server::handleReceivedMessage(int client_socket)
         {
             case GROUP_MESSAGE: handleGroupMessage(msg, client_socket, client_sockets); break;
             case REGISTER:      ServerhandleRegister(msg, client_socket, connect);      break;
-            case LOGIN:                                                                 break;
+            case LOGIN:         ServerhandleLogin(msg, client_socket, connect);         break;
             case FORGETPASSWD:                                                          break;
             case FOUNDPASSWD:                                                           break;
         }

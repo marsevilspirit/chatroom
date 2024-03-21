@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmessage.a CMakeFiles/message.dir/message.cc.o CMakeFiles/message.dir/__/mysql/mysql.cc.o
+/usr/bin/ranlib libmessage.a

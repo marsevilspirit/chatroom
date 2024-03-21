@@ -119,7 +119,6 @@ void handleGroupMessage(char* msg, int client_socket, std::vector<int>& client_s
     std::cout << "Received message from client_socket: " << client_socket << '\n';
     std::cout << msg << '\n';
     int len = strlen(msg);
-    printf("3");
     for(const auto& socket : client_sockets) 
     {
         if(socket != client_socket)
@@ -135,25 +134,42 @@ void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
     
     char* email = msg;  
 
+    printf("1\n");
+
     while(*msg != ' ' && *msg != '\0')
         msg++;
+
+    printf("2\n");
 
     *msg = '\0';
     msg++;
     char* password = msg;
 
+    printf("3\n");
+
     while(*msg != ' ' && *msg!= '\0')
         msg++;
+
+    printf("4\n");
 
     *msg = '\0';
     msg++;
     char* name = msg;
 
-    sql_insert(connect, email, password, name); 
+    printf("5\n");
 
-    std::cout << email << " " << password << " " << name << '\n';
+    std::string send;
 
-    std::string send("注册成功");
+    if(sql_insert(connect, email, password, name) == 0)
+    {
+        send = "该账号已注册"; 
+    }
+    else 
+    {
+        std::cout << email << " " << password << " " << name << '\n';
+
+        send = "注册成功";
+    }
 
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }

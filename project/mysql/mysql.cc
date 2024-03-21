@@ -31,17 +31,25 @@ MYSQL* sql_init(MYSQL* connect)
     return connect;
 }
 
-void sql_insert(MYSQL* connect, char* email, char* password, char* name)
+int sql_insert(MYSQL* connect, char* email, char* password, char* name)
 {
+
+    printf("6\n");
     // 构造插入 SQL 语句
     std::string sql_query = "INSERT INTO accounts (email, password, name) VALUES ('" +
                             std::string(email) + "', '" + std::string(password) + "', '" +
                             std::string(name) + "')";
     // 执行 SQL 语句
+
+    printf("7\n");
+
     if (mysql_query(connect, sql_query.c_str())) 
     {
         std::cerr << "Error inserting data into table: " << mysql_error(connect) << '\n';
-        mysql_close(connect);
+
+        return 0;
     }
+    
+    return 1;
 }
 

@@ -122,8 +122,7 @@ static void ClienthandleRegister(int sfd)
     Type flag;
     recvMsg(sfd, &cstr, &flag);
 
-    if(strcmp(cstr, "注册成功"))
-        std::cout << "注册成功\n";
+    std::cout << cstr << '\n';
 
     // 在这里可以继续处理注册逻辑
     delete [] cstr;

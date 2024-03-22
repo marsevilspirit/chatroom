@@ -17,7 +17,7 @@ MYSQL* sql_init(MYSQL* connect)
 
     // 创建表格
     if (mysql_query(connect, "CREATE TABLE IF NOT EXISTS accounts (\
-        email VARCHAR(255) PRIMARY KEY,\
+                email VARCHAR(255) PRIMARY KEY,\
                 password VARCHAR(255) NOT NULL,\
                 name VARCHAR(255) NOT NULL,\
                 online_status BOOLEAN DEFAULT false)")) 
@@ -25,6 +25,12 @@ MYSQL* sql_init(MYSQL* connect)
                     std::cerr << "Error creating table: " << mysql_error(connect) << '\n';
                     mysql_close(connect);
                 }
+
+    std::string query = "UPDATE accounts SET online_status = 0";
+    if (mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+    }
 
     std::cout << "database ready\n";
 
@@ -82,13 +88,37 @@ int sql_online(MYSQL* connect, const char* email)
 {
     std::string query = "SELECT 1 FROM accounts WHERE email ='" + std::string(email) + "' AND online_status='0' LIMIT 1";
 
-    if (mysql_query(connect, query.c_str())){
+    if (mysql_query(connect, query.c_str()))
+    {
         std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
-    if (result == nullptr){
+    if (result == nullptr)
+    {
+        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    int count = mysql_num_rows(result);
+
+    return (count > 0) ? 1 : 0;
+}
+
+int sql_if_online(MYSQL* connect, const char* email)
+{
+    std::string query = "SELECT 1 FROM accounts WHERE email ='" + std::string(email) + "' AND online_status='1' LIMIT 1";
+
+    if (mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr)
+    {
         std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
         return 0;
     }
@@ -135,4 +165,25 @@ int delete_account(MYSQL* connect, const char* email)
     }
 
     return 1;
+}
+
+std::string sql_getname(MYSQL* connect, const char* email)
+{
+    std::string query = "SELECT name FROM accounts WHERE email = '" + std::string(email) + "'";
+
+    if(mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if(result == nullptr)
+    {
+        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(result);
+    std::string name = row[0];
+
+    return name;
 }

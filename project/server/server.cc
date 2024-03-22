@@ -139,8 +139,6 @@ void server::handleReceivedMessage(int client_socket)
 
 void server::run()
 {
-    
-
     struct epoll_event event{};
     event.events = EPOLLIN;
     event.data.fd = server_socket;

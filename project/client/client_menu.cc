@@ -13,7 +13,7 @@ static int is_valid_email(const char *email)
     if (reti) 
     {
         fprintf(stderr, "无法编译reti\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     // 执行正则表达式匹配
@@ -84,7 +84,7 @@ static void ClienthandleRegister(int sfd)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
 
-    std::cout << std::endl; // 输出换行
+    std::cout << '\n'; // 输出换行
 
     std::cout << "确认密码: ";
 
@@ -97,7 +97,7 @@ static void ClienthandleRegister(int sfd)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
 
-    std::cout << std::endl; // 输出换行
+    std::cout << '\n'; // 输出换行
 
     // 检查密码和确认密码是否一致
     if (passwd != confirmPasswd)
@@ -149,7 +149,7 @@ static int ClienthandleLogin(int sfd)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
 
-    std::cout << std::endl; // 输出换行
+    std::cout << '\n'; // 输出换行
 
     std::string msg = email + ' ' + passwd;
 
@@ -227,7 +227,7 @@ static void ClienthandleForgetPasswd(int sfd)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
 
-    std::cout << std::endl; // 输出换行
+    std::cout << '\n'; // 输出换行
 
     std::cout << "确认密码: ";
 
@@ -240,7 +240,7 @@ static void ClienthandleForgetPasswd(int sfd)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
 
-    std::cout << std::endl; // 输出换行
+    std::cout << '\n'; // 输出换行
 
     // 检查密码和确认密码是否一致
     if (passwd != confirmPasswd)
@@ -286,7 +286,7 @@ void ClienthandleDeleteAccount(int sfd)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
 
-    std::cout << std::endl; // 输出换行
+    std::cout << '\n'; // 输出换行
 
     std::string choice;
     std::cout << "你确定要删除账号吗？(y/n): ";
@@ -339,4 +339,3 @@ void enterChatroom(int sfd)
         }
     }
 }
-

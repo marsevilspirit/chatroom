@@ -121,15 +121,16 @@ void handleGroupMessage(MYSQL* connect, char* msg, int client_socket, std::vecto
 {
     std::cout << "Received message from client: " << hashTable[client_socket] << '\n';
     std::cout << msg << '\n';
-    int len = strlen(msg);
+
+    std::string send = sql_getname(connect, hashTable[client_socket].c_str()) + ": \n" + msg;
 
     for(const auto& socket : client_sockets) 
     {
-        if(sql_online(connect, hashTable[socket].c_str()) == 0)
+        if(sql_if_online(connect, hashTable[socket].c_str()) == 0)
             continue;
 
         if(socket != client_socket)
-            sendMsg(socket, msg, len, GROUP_MESSAGE);
+            sendMsg(socket, send.c_str(), send.size(), GROUP_MESSAGE);
     }
     free(msg);   
 }

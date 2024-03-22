@@ -5,7 +5,6 @@
 #define BUF_SIZE 2048
 
 std::mutex mtx; // 互斥量，用于保护标准输出
-int stop = 1;
 
 void errExit(const char* error)
 {
@@ -15,38 +14,22 @@ void errExit(const char* error)
 
 void sendMessageThread(int sfd) 
 {
-    char buf[BUF_SIZE];
-    while (stop) {
-        memset(buf, 0, BUF_SIZE);
-        if (fgets(buf, BUF_SIZE, stdin) == nullptr) 
+    std::string msg;
+    while (true)
+    {
+
+        std::cin >> msg;
+
+        if (strcmp(msg.c_str(), "exit") == 0)
         {
-            printf("Exiting...\n");
+            std::cout << "Exiting...\n";
+            exit(EXIT_SUCCESS);
             break;
         }
 
-        int len = strlen(buf);
-        
-        // 去除输入内容末尾的换行符
-        if (len > 0 && buf[len-1] == '\n') 
+        if (sendMsg(sfd, msg.c_str(), msg.size(), GROUP_MESSAGE) == -1) 
         {
-            buf[len-1] = '\0';
-            len--;
-        }
-
-        if (buf[0] == '\0') {
-            continue;
-        }
-
-        if (strcmp(buf, "exit") == 0)
-        {
-            printf("Exiting...\n");
-            stop = 0;
-            break;
-        }
-
-        if (sendMsg(sfd, buf, len, GROUP_MESSAGE) == -1) 
-        {
-            printf("Failed to send message.\n");
+            std::cout << "Failed to send message.\n";
             break;
         }
     }
@@ -56,17 +39,17 @@ void receiveMessageThread(int sfd)
 {
     char* buf;
     Type flag;
-    while (stop) 
+    while (true) 
     {
         int len = recvMsg(sfd, &buf, &flag);
-        switch (flag)
+        /*switch (flag)
         {
             case GROUP_MESSAGE: std::cout << "GROUP_MESSAGE\n"; break;
             case LOGIN: std::cout << "LOGIN\n"; break;
             case REGISTER: std::cout << "REGISTER\n"; break;
             case SERVER_MESSAGE: std::cout << "SERVER_MESSAGE"; break;
             default: std::cout << "UNKNOWN\n"; break;
-        }
+        }*/
         if (len == -1) 
         {
             perror("recv");
@@ -78,13 +61,12 @@ void receiveMessageThread(int sfd)
         }
 
         std::lock_guard<std::mutex> lock(mtx); // 使用互斥量保护标准输出
-        printf("Received message from server: %s\n", buf);
+        std::cout << buf << '\n';
     }
 }
 
 int main(void) 
 {
-
     int sfd;
     struct sockaddr_in svaddr;
 

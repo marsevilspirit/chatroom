@@ -117,13 +117,17 @@ int recvMsg(int cfd, char** msg, Type* flag)
     return ret;
 }
 
-void handleGroupMessage(char* msg, int client_socket, std::vector<int>& client_sockets)
+void handleGroupMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets)
 {
-    std::cout << "Received message from client_socket: " << client_socket << '\n';
+    std::cout << "Received message from client: " << hashTable[client_socket] << '\n';
     std::cout << msg << '\n';
     int len = strlen(msg);
+
     for(const auto& socket : client_sockets) 
     {
+        if(sql_online(connect, hashTable[socket].c_str()) == 0)
+            continue;
+
         if(socket != client_socket)
             sendMsg(socket, msg, len, GROUP_MESSAGE);
     }
@@ -195,7 +199,11 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
     if(find)
         send = "登录成功";
     else 
+    { 
         send = "登录失败，账号或密码错误";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
 
     if(update_online_status(connect, email, 1) == 0)
     {

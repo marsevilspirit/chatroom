@@ -22,7 +22,7 @@ int sendMsg(int cfd, const char* msg, int len, Type flag);
 
 int recvMsg(int cfd, char** msg, Type* flag);
 
-void handleGroupMessage(char* msg, int client_socket, std::vector<int>& client_sockets);
+void handleGroupMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets);
 
 void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect);
 

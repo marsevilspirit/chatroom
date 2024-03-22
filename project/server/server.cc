@@ -127,7 +127,7 @@ void server::handleReceivedMessage(int client_socket)
     {
         switch (flag)
         {
-            case GROUP_MESSAGE: handleGroupMessage(msg, client_socket, client_sockets); break;
+            case GROUP_MESSAGE: handleGroupMessage(connect, msg, client_socket, client_sockets); break;
             case REGISTER:      ServerhandleRegister(msg, client_socket, connect);      break;
             case LOGIN:         ServerhandleLogin(msg, client_socket, connect);         break;
             case FORGET_PASSWD: ServerhandleForgetPasswd(msg, client_socket, connect);  break;
@@ -139,6 +139,8 @@ void server::handleReceivedMessage(int client_socket)
 
 void server::run()
 {
+    
+
     struct epoll_event event{};
     event.events = EPOLLIN;
     event.data.fd = server_socket;

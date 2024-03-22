@@ -131,7 +131,7 @@ void server::handleReceivedMessage(int client_socket)
             case REGISTER:      ServerhandleRegister(msg, client_socket, connect);      break;
             case LOGIN:         ServerhandleLogin(msg, client_socket, connect);         break;
             case FORGET_PASSWD: ServerhandleForgetPasswd(msg, client_socket, connect);  break;
-            case FOUND_PASSWD:                                                          break;
+            case DELETE_ACCOUNT:ServerhandleDeleteAccount(msg, client_socket, connect); break;
             default:            std::cerr << "Unknown message type\n";                  break;
         }
     }

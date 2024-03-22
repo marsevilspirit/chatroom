@@ -13,7 +13,7 @@ enum Type{
     LOGIN = 1,
     REGISTER,
     FORGET_PASSWD,
-    FOUND_PASSWD,
+    DELETE_ACCOUNT,
     GROUP_MESSAGE,
     SERVER_MESSAGE,
 };

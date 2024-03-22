@@ -184,7 +184,7 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 
     if(sql_online(connect, email) == 0)
     {
-        send = "账号已登录";
+        send = "账号已登录或不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
@@ -211,7 +211,7 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 
 void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
 {
-    std::cout << "new user want to login: " << client_socket << '\n'; 
+    std::cout << "new user want to change password: " << client_socket << '\n'; 
     std::cout << msg << '\n';
 
     char* email = msg;
@@ -245,5 +245,33 @@ void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
 
 void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
 {
-    
+    std::cout << "new user want to delete account: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* email = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* password = msg;
+    std::string send;
+
+    if(sql_online(connect, email) == 0)
+    {
+        send = "账号已登录, 请先退出登录";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    if(delete_account(connect, email) == 0)
+    {
+        send = "删除账号失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "删除账号成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }

@@ -133,7 +133,7 @@ static int ClienthandleLogin(int sfd)
 
     if (!is_valid_email(email.c_str()))
     {
-        std::cout << "邮箱格式不对";
+        std::cout << "邮箱格式不对\n";
         return 0;
     }
 
@@ -182,7 +182,7 @@ static void ClienthandleForgetPasswd(int sfd)
 
     if (!is_valid_email(email.c_str()))
     {
-        std::cout << "邮箱格式不对";
+        std::cout << "邮箱格式不对\n";
         return;
     }
 
@@ -264,6 +264,49 @@ void ClienthandleDeleteAccount(int sfd)
 {
     std::string email;
     std::string passwd;
+
+    std::cout << "输入邮箱: "; 
+    std::cin >> email;
+
+    if (!is_valid_email(email.c_str()))
+    {
+        std::cout << "邮箱格式不对\n";
+        return;
+    }
+
+    std::cout << "输入密码: ";
+
+    termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~ECHO; // 关闭回显
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    std::cin >> passwd;
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // 恢复回显
+
+    std::cout << std::endl; // 输出换行
+
+    std::string choice;
+    std::cout << "你确定要删除账号吗？(y/n): ";
+    std::cin >> choice;
+
+    if(choice != "y")
+    {
+        return;
+    }
+
+    std::string msg = email + ' ' + passwd;
+    
+    sendMsg(sfd, msg.c_str(), msg.size(), DELETE_ACCOUNT);
+
+    char* cstr;
+
+    Type flag;
+    recvMsg(sfd, &cstr, &flag);
+
+    std::cout << cstr << '\n';
 }
 
 static void clearInputBuffer() 
@@ -277,7 +320,7 @@ void enterChatroom(int sfd)
     for(;;)
     {
         std::cout << "1.注册     2.登录\n";
-        std::cout << "3.忘记密码 4.修改密码\n";
+        std::cout << "3.忘记密码 4.删除账号\n";
         std::cout << "输入选项：";
 
         int choice;

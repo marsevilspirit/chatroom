@@ -123,3 +123,16 @@ int update_passwd(MYSQL* connect, const char* email, const char* password)
 
     return 1;
 }
+
+int delete_account(MYSQL* connect, const char* email)
+{
+    std::string query = "DELETE FROM accounts WHERE email = '" + std::string(email) + "'";
+
+    if(mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error deleting account: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
+}

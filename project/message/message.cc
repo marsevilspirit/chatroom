@@ -14,7 +14,7 @@ static int writen(int fd, const char* msg, int size)
             if(errno == EPIPE || errno == ECONNRESET)
             {
                 printf("Network connection reset or broken.\n");
-                return -1; // Return -1 to indicate network error
+                return -1;
             }
             else
             {
@@ -88,7 +88,7 @@ int recvMsg(int cfd, char** msg, Type* flag)
     int len = 0;
     if (readn(cfd, (char*)&len, 4) == -1) 
     {
-        return -1; // Error reading length
+        return -1;
     }
 
     len = ntohl(len);
@@ -96,7 +96,7 @@ int recvMsg(int cfd, char** msg, Type* flag)
     int recvFlag = 0;
     if (readn(cfd, (char*)&recvFlag, 4) == -1) 
     {
-        return -1; // Error reading flag
+        return -1;
     }
 
     recvFlag = ntohl(recvFlag);
@@ -167,6 +167,13 @@ void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
         std::cout << email << " " << password << " " << name << '\n';
 
         send = "注册成功";
+    }
+
+    //为注册的用户创建列表
+    if(sql_create_list(connect, email) == 0)
+    {
+        std::cerr << "fail to create friend table\n";
+        send = "创建好友列表失败";
     }
 
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -277,6 +284,14 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
     if(delete_account(connect, email) == 0)
     {
         send = "删除账号失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    if(sql_delete_list(connect, email) == 0)
+    {
+        std::cerr << "fail to delete table\n";
+        send = "删除列表失败";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }

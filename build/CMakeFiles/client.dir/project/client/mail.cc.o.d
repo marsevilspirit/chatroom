@@ -232,4 +232,11 @@ CMakeFiles/client.dir/project/client/mail.cc.o: \
  /usr/include/mysql/mysql/client_plugin.h \
  /usr/include/mysql/mysql/plugin_auth_common.h \
  /usr/include/mysql/mysql_version.h /usr/include/mysql/mysql_time.h \
- /usr/include/mysql/errmsg.h
+ /usr/include/mysql/errmsg.h /usr/include/c++/13.2.1/algorithm \
+ /usr/include/c++/13.2.1/bits/stl_algo.h \
+ /usr/include/c++/13.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/13.2.1/bits/stl_heap.h \
+ /usr/include/c++/13.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/13.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/13.2.1/pstl/glue_algorithm_defs.h \
+ /usr/include/c++/13.2.1/pstl/execution_defs.h

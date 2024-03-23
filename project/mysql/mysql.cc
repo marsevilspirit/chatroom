@@ -15,7 +15,7 @@ MYSQL* sql_init(MYSQL* connect)
         mysql_close(connect);
     }
 
-    // 创建表格
+    // 创建账户表格
     if (mysql_query(connect, "CREATE TABLE IF NOT EXISTS accounts (\
                 email VARCHAR(255) PRIMARY KEY,\
                 password VARCHAR(255) NOT NULL,\
@@ -186,4 +186,56 @@ std::string sql_getname(MYSQL* connect, const char* email)
     std::string name = row[0];
 
     return name;
+}
+
+int sql_create_list(MYSQL* connect, const char* email) 
+{
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "CREATE TABLE IF NOT EXISTS " + emailStr + "_list (\
+            email VARCHAR(255) PRIMARY KEY,\
+            type VARCHAR(255) NOT NULL)";
+
+    std::cout << "create list " << email << '\n';
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error creating list: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
+}
+
+int sql_delete_list(MYSQL* connect, const char* email) 
+{
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "DROP TABLE " + emailStr + "_list";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error deleting list: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
 }

@@ -149,7 +149,6 @@ void handleGroupMessage(MYSQL* connect, char* msg, int client_socket, std::vecto
 void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
 {
     std::cout << "New user want to register: " << client_socket << '\n';
-    std::cout << msg <<'\n';
     
     char* email = msg;  
 
@@ -193,7 +192,6 @@ void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
 void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 {
     std::cout << "new user want to login: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
 
     char* email = msg;
 
@@ -239,7 +237,6 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
 {
     std::cout << "new user want to change password: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
 
     char* email = msg;
 
@@ -273,7 +270,6 @@ void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
 void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
 {
     std::cout << "new user want to delete account: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
 
     char* email = msg;
 
@@ -415,7 +411,6 @@ void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect)
     std::string email = hashTable[client_socket];
 
     std::cout << "user want to display friend: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
 
     std::string send;
 

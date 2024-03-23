@@ -56,18 +56,23 @@ static void friend_menu(int sfd)
     std::cout << "3.屏蔽好友 4.解除屏蔽\n";
     std::cout << "5.好友列表 6.返回\n";
 
-    int command;
+    char command;
     std::cin >> command;
     clearInputBuffer();
 
     switch (command)
     {
-        case 1: add_friend(sfd);     break; 
-        case 2: delete_friend(sfd);  break;
-        case 3: block_friend(sfd);   break;
-        case 4: unblock_friend(sfd); break;
-        case 5: display_friend(sfd); break;
-        case 6: return;
+        case '1':     add_friend(sfd);                break; 
+        case '2':     delete_friend(sfd);             break;
+        case '3':     block_friend(sfd);              break;
+        case '4':     unblock_friend(sfd);            break;
+        case '5':     display_friend(sfd);            break;
+        case '6':     std::cout << "exit...";         return;
+        case 'h': 
+                    std::cout << "1.添加好友 2.删除好友\n";
+                    std::cout << "3.屏蔽好友 4.解除屏蔽\n";
+                    std::cout << "5.好友列表 6.返回\n";
+                    break;
     }
 }
 
@@ -84,6 +89,7 @@ static void private_chat(int sfd)
 
     while(msg != "exit")
     {
+        std::cout << '\n';
         std::string send = email + ' ' + msg;
         sendMsg(sfd, send.c_str(), send.size(), PRIVATE_MESSAGE);
         std::cin >> msg;
@@ -99,20 +105,26 @@ void commandMenu(int sfd)
 
     while(true)
     {
-        int command;
+        char command;
         std::cin >> command;
         clearInputBuffer(); // 清空输入缓冲区
 
         switch (command)
         {
-            case 1: private_chat(sfd);  break;
-            case 2:  break;
-            case 3:  break;
-            case 4:  break;
-            case 5: friend_menu(sfd); break;
-            case 6:  break;
-            case 7:  break;
-            case 8:  return;
+            case '1':     private_chat(sfd);              break;
+            case '2':     break;
+            case '3':     break;
+            case '4':     break;
+            case '5':     friend_menu(sfd);               break;
+            case '6':     break;
+            case '7':     break;
+            case '8':     std::cout << "exit command";   return;
+            case 'h': 
+                        std::cout << "1.私聊      2.群聊\n";
+                        std::cout << "3.发送文件  4.查看文件\n";
+                        std::cout << "5.好友操作  6.群操作\n";
+                        std::cout << "7.黑名单    8.退出\n";
+                        break;
         }
     }
 }

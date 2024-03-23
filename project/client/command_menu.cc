@@ -71,6 +71,25 @@ static void friend_menu(int sfd)
     }
 }
 
+static void private_chat(int sfd)
+{
+    std::string email;
+    std::cout << "请输入对方的邮箱: ";
+    std::cin >> email;
+
+    std::string msg;
+    std::cout << "现在是私聊: \n";
+
+    std::cin >> msg;
+
+    while(msg != "exit")
+    {
+        std::string send = email + ' ' + msg;
+        sendMsg(sfd, send.c_str(), send.size(), PRIVATE_MESSAGE);
+        std::cin >> msg;
+    }
+}
+
 void commandMenu(int sfd)
 {
     std::cout << "1.私聊      2.群聊\n";
@@ -86,7 +105,7 @@ void commandMenu(int sfd)
 
         switch (command)
         {
-            case 1:  break;
+            case 1: private_chat(sfd);  break;
             case 2:  break;
             case 3:  break;
             case 4:  break;

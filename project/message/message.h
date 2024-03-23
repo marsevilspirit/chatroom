@@ -21,6 +21,7 @@ enum Type{
     BLOCK_FRIEND,
     DISPLAY_FRIEND,
     UNBLOCK_FRIEND,
+    PRIVATE_MESSAGE,
 };
 
 int sendMsg(int cfd, const char* msg, int len, Type flag);
@@ -46,3 +47,5 @@ void ServerhandleBlockFriend(char* msg, int client_socket, MYSQL* connect);
 void ServerhandleUnblockFriend(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect);

@@ -2,6 +2,17 @@
 
 std::unordered_map<int, std::string> hashTable;
 
+int find_key_by_value(const std::unordered_map<int, std::string>& map, const std::string& value)
+{
+    for(const auto& pair : map)
+    {
+        if(pair.second == value)
+            return pair.first;
+    }
+
+    return -1;
+}
+
 static int writen(int fd, const char* msg, int size)
 {
     const char* buf = msg;
@@ -309,6 +320,8 @@ void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
 
     char* friend_email = msg;
 
+    int friend_fd = find_key_by_value(hashTable, friend_email);
+
     std::string send;
 
     if(sql_add_friend(connect, email.c_str(), friend_email) == 0)
@@ -317,6 +330,15 @@ void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
+
+    if(sql_if_online(connect, friend_email))
+    {
+        send = "您有新的好友请求from " + email;
+        sendMsg(friend_fd, send.c_str(), send.size(), SERVER_MESSAGE);
+    }
+
+    if(!is_friend(connect, email.c_str(), friend_email))
+        sql_request(connect, email.c_str(), friend_email);//好友申请
 
     send = "添加好友成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -405,4 +427,46 @@ void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect)
     }
 
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to send private message: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* friend_email = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* message = msg;
+
+    std::string send = sql_getname(connect, email.c_str()) + ": \n" + message;
+
+    if(sql_if_online(connect, friend_email) == 0)
+    {
+        send = "对方不在线";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    if(sql_if_block(connect, email.c_str(), friend_email))
+    {
+        send = "您已被对方屏蔽";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    for(const auto& socket : hashTable)
+    {
+        if(socket.second == friend_email)
+        {
+            sendMsg(socket.first, send.c_str(), send.size(), PRIVATE_MESSAGE);
+            break;
+        }
+    }
 }

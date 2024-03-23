@@ -27,9 +27,15 @@ int sql_delete_list(MYSQL* connect, const char* email);
 
 int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email);
 
+bool is_friend(MYSQL* connect, const char* email, const char* friend_email);
+
+int sql_request(MYSQL* connect,const char* email,const char* friend_email);//好友申请
+
 int sql_delete_friend(MYSQL* connect, const char* email, const char* friend_email);
 
 int sql_block_friend(MYSQL* connect, const char* email, const char* friend_email);
+
+int sql_if_block(MYSQL* connect, const char* email, const char* friend_email);
 
 int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_email);
 

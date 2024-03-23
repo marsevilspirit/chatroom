@@ -50,14 +50,15 @@ void receiveMessageThread(int sfd)
     while (true) 
     {
         int len = recvMsg(sfd, &msg, &flag);
-        /*switch (flag)
+        switch (flag)
         {
-            case GROUP_MESSAGE: std::cout << "GROUP_MESSAGE\n"; break;
-            case LOGIN: std::cout << "LOGIN\n"; break;
-            case REGISTER: std::cout << "REGISTER\n"; break;
-            case SERVER_MESSAGE: std::cout << "SERVER_MESSAGE\n"; break;
-            default: std::cout << "UNKNOWN\n"; break;
-        }*/
+            case GROUP_MESSAGE:     std::cout << "GROUP_MESSAGE\n";         break;
+            case LOGIN:             std::cout << "LOGIN\n";                 break;
+            case REGISTER:          std::cout << "REGISTER\n";              break;
+            case PRIVATE_MESSAGE:   std::cout << "PRIVATE_MESSAGE\n";       break;
+            case SERVER_MESSAGE:    std::cout << "SERVER_MESSAGE\n";        break;
+            default:                std::cout << "UNKNOWN\n";               break;
+        }
         if (len == -1) 
         {
             perror("recv");

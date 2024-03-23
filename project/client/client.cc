@@ -2,7 +2,6 @@
 
 #define PORT_NUM 8000
 #define IP "127.0.0.1"
-#define BUF_SIZE 2048
 
 std::mutex mtx; // 互斥量，用于保护标准输出
 
@@ -32,22 +31,24 @@ void sendMessageThread(int sfd)
             std::cout << "Failed to send message.\n";
             break;
         }
+
+        std::cout << '\n';
     }
 }
 
 void receiveMessageThread(int sfd) 
 {
-    char* buf;
+    char* msg;
     Type flag;
     while (true) 
     {
-        int len = recvMsg(sfd, &buf, &flag);
+        int len = recvMsg(sfd, &msg, &flag);
         /*switch (flag)
         {
             case GROUP_MESSAGE: std::cout << "GROUP_MESSAGE\n"; break;
             case LOGIN: std::cout << "LOGIN\n"; break;
             case REGISTER: std::cout << "REGISTER\n"; break;
-            case SERVER_MESSAGE: std::cout << "SERVER_MESSAGE"; break;
+            case SERVER_MESSAGE: std::cout << "SERVER_MESSAGE\n"; break;
             default: std::cout << "UNKNOWN\n"; break;
         }*/
         if (len == -1) 
@@ -61,7 +62,9 @@ void receiveMessageThread(int sfd)
         }
 
         std::lock_guard<std::mutex> lock(mtx); // 使用互斥量保护标准输出
-        std::cout << buf << '\n';
+        std::cout << msg << '\n';
+
+        std::cout << '\n';
     }
 }
 

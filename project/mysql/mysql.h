@@ -24,3 +24,13 @@ std::string sql_getname(MYSQL* connect, const char* email);
 int sql_create_list(MYSQL* connect, const char* email);
 
 int sql_delete_list(MYSQL* connect, const char* email);
+
+int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email);
+
+int sql_delete_friend(MYSQL* connect, const char* email, const char* friend_email);
+
+int sql_block_friend(MYSQL* connect, const char* email, const char* friend_email);
+
+int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_email);
+
+int sql_display_friend(MYSQL* connect, const char* email, std::string& send);

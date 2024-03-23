@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/client.dir/project/client/client.cc.o.d"
   "CMakeFiles/client.dir/project/client/client_menu.cc.o"
   "CMakeFiles/client.dir/project/client/client_menu.cc.o.d"
+  "CMakeFiles/client.dir/project/client/command_menu.cc.o"
+  "CMakeFiles/client.dir/project/client/command_menu.cc.o.d"
   "CMakeFiles/client.dir/project/client/mail.cc.o"
   "CMakeFiles/client.dir/project/client/mail.cc.o.d"
   "client"

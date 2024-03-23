@@ -1,4 +1,5 @@
 #include "client_menu.h"
+#include "command_menu.h"
 
 #define PORT_NUM 8000
 #define IP "127.0.0.1"
@@ -19,11 +20,17 @@ void sendMessageThread(int sfd)
 
         std::cin >> msg;
 
-        if (strcmp(msg.c_str(), "exit") == 0)
+        if (msg == "exit")
         {
             std::cout << "Exiting...\n";
             exit(EXIT_SUCCESS);
             break;
+        }
+
+        if(msg == "command")
+        {
+            commandMenu(sfd);
+            continue;
         }
 
         if (sendMsg(sfd, msg.c_str(), msg.size(), GROUP_MESSAGE) == -1) 

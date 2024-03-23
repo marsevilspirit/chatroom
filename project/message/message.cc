@@ -299,3 +299,110 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
     send = "删除账号成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }
+
+void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to add friend: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* friend_email = msg;
+
+    std::string send;
+
+    if(sql_add_friend(connect, email.c_str(), friend_email) == 0)
+    {
+        send = "添加好友失败, 该用户不存在或已是好友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "添加好友成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleDeleteFriend(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to delete friend: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* friend_email = msg;
+
+    std::string send;
+
+    if(sql_delete_friend(connect, email.c_str(), friend_email) == 0)
+    {
+        send = "删除好友失败, 该用户不存在或不是好友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "删除好友成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleBlockFriend(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to block friend: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* friend_email = msg;
+
+    std::string send;
+
+    if(sql_block_friend(connect, email.c_str(), friend_email) == 0)
+    {
+        send = "屏蔽好友失败, 该用户不存在或已被屏蔽";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "屏蔽好友成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleUnblockFriend(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to unblock friend: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* friend_email = msg;
+
+    std::string send;
+
+    if(sql_unblock_friend(connect, email.c_str(), friend_email) == 0)
+    {
+        send = "解除屏蔽好友失败, 该用户不存在或未被屏蔽";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "解除屏蔽好友成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to display friend: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    std::string send;
+
+    if(sql_display_friend(connect, email.c_str(), send) == 0)
+    {
+        send = "获取好友列表失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}

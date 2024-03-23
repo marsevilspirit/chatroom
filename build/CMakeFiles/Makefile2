@@ -164,12 +164,12 @@ CMakeFiles/chatroom.dir/clean:
 CMakeFiles/client.dir/all: project/message/CMakeFiles/message.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=3,4,5,6 "Built target client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=3,4,5,6,7 "Built target client"
 .PHONY : CMakeFiles/client.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/client.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/client.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 0
 .PHONY : CMakeFiles/client.dir/rule
@@ -191,7 +191,7 @@ project/server/CMakeFiles/server.dir/all: project/threadpool/CMakeFiles/threadpo
 project/server/CMakeFiles/server.dir/all: project/message/CMakeFiles/message.dir/all
 	$(MAKE) $(MAKESILENT) -f project/server/CMakeFiles/server.dir/build.make project/server/CMakeFiles/server.dir/depend
 	$(MAKE) $(MAKESILENT) -f project/server/CMakeFiles/server.dir/build.make project/server/CMakeFiles/server.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=10,11,12,13 "Built target server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=11,12,13,14 "Built target server"
 .PHONY : project/server/CMakeFiles/server.dir/all
 
 # Build rule for subdir invocation for target.
@@ -217,7 +217,7 @@ project/server/CMakeFiles/server.dir/clean:
 project/threadpool/CMakeFiles/threadpool.dir/all:
 	$(MAKE) $(MAKESILENT) -f project/threadpool/CMakeFiles/threadpool.dir/build.make project/threadpool/CMakeFiles/threadpool.dir/depend
 	$(MAKE) $(MAKESILENT) -f project/threadpool/CMakeFiles/threadpool.dir/build.make project/threadpool/CMakeFiles/threadpool.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=14,15 "Built target threadpool"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=15,16 "Built target threadpool"
 .PHONY : project/threadpool/CMakeFiles/threadpool.dir/all
 
 # Build rule for subdir invocation for target.
@@ -243,7 +243,7 @@ project/threadpool/CMakeFiles/threadpool.dir/clean:
 project/message/CMakeFiles/message.dir/all:
 	$(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/depend
 	$(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=7,8,9 "Built target message"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=8,9,10 "Built target message"
 .PHONY : project/message/CMakeFiles/message.dir/all
 
 # Build rule for subdir invocation for target.

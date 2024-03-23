@@ -132,6 +132,11 @@ void server::handleReceivedMessage(int client_socket)
             case LOGIN:         ServerhandleLogin(msg, client_socket, connect);         break;
             case FORGET_PASSWD: ServerhandleForgetPasswd(msg, client_socket, connect);  break;
             case DELETE_ACCOUNT:ServerhandleDeleteAccount(msg, client_socket, connect); break;
+            case ADD_FRIEND:    ServerhandleAddFriend(msg, client_socket, connect);     break;
+            case DELETE_FRIEND: ServerhandleDeleteFriend(msg, client_socket, connect);  break;
+            case BLOCK_FRIEND:  ServerhandleBlockFriend(msg, client_socket, connect);   break;
+            case UNBLOCK_FRIEND:ServerhandleUnblockFriend(msg, client_socket, connect); break;
+            case DISPLAY_FRIEND:ServerhandleDisplayFriend(msg, client_socket, connect); break;
             default:            std::cerr << "Unknown message type\n";                  break;
         }
     }

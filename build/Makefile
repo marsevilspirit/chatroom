@@ -229,6 +229,30 @@ project/client/client_menu.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/project/client/client_menu.cc.s
 .PHONY : project/client/client_menu.cc.s
 
+project/client/command_menu.o: project/client/command_menu.cc.o
+.PHONY : project/client/command_menu.o
+
+# target to build an object file
+project/client/command_menu.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/project/client/command_menu.cc.o
+.PHONY : project/client/command_menu.cc.o
+
+project/client/command_menu.i: project/client/command_menu.cc.i
+.PHONY : project/client/command_menu.i
+
+# target to preprocess a source file
+project/client/command_menu.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/project/client/command_menu.cc.i
+.PHONY : project/client/command_menu.cc.i
+
+project/client/command_menu.s: project/client/command_menu.cc.s
+.PHONY : project/client/command_menu.s
+
+# target to generate assembly for a file
+project/client/command_menu.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/project/client/command_menu.cc.s
+.PHONY : project/client/command_menu.cc.s
+
 project/client/mail.o: project/client/mail.cc.o
 .PHONY : project/client/mail.o
 
@@ -296,6 +320,9 @@ help:
 	@echo "... project/client/client_menu.o"
 	@echo "... project/client/client_menu.i"
 	@echo "... project/client/client_menu.s"
+	@echo "... project/client/command_menu.o"
+	@echo "... project/client/command_menu.i"
+	@echo "... project/client/command_menu.s"
 	@echo "... project/client/mail.o"
 	@echo "... project/client/mail.i"
 	@echo "... project/client/mail.s"

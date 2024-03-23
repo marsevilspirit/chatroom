@@ -19,4 +19,3 @@
 void enterChatroom(int sfd);
 
 int verify(const char* usermail, char* verify_number);
-

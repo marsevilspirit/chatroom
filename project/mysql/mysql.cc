@@ -239,3 +239,195 @@ int sql_delete_list(MYSQL* connect, const char* email)
 
     return 1;
 }
+
+int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)
+{
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "INSERT INTO " + emailStr + "_list (email, type) VALUES ('" + std::string(friend_email) + "', 'friend')";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error adding friend: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1; 
+}
+
+bool is_friend(MYSQL* connect, const char* email, const char* friend_email)
+{
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "SELECT COUNT(*) FROM " + emailStr + "_list WHERE email = '" + std::string(friend_email) + "'";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error checking friend: " << mysql_error(connect) << '\n';
+        return false; // 默认不是好友
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr) 
+    {
+        std::cerr << "Error retrieving result: " << mysql_error(connect) << '\n';
+        return false; // 默认不是好友
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(result);
+    if (row == nullptr || std::stoi(row[0]) == 0) 
+    {
+        mysql_free_result(result);
+        return false; // 不是好友
+    }
+
+    mysql_free_result(result);
+    return true; // 是好友
+}
+
+int sql_delete_friend(MYSQL* connect, const char* email, const char* friend_email)
+{
+    if (!is_friend(connect, email, friend_email)) 
+    {
+        std::cerr << "Error: " << friend_email << " is not your friend\n";
+        return 0;
+    }
+
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "DELETE FROM " + emailStr + "_list WHERE email = '" + std::string(friend_email) + "'";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error deleting friend: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
+}
+
+int sql_block_friend(MYSQL* connect, const char* email, const char* friend_email)
+{
+    if (!is_friend(connect, email, friend_email)) 
+    {
+        std::cerr << "Error: " << friend_email << " is not your friend\n";
+        return 0;
+    }
+
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "UPDATE " + emailStr + "_list SET type = 'block' WHERE email = '" + std::string(friend_email) + "'";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error blocking friend: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
+}
+
+int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_email)
+{
+    if (!is_friend(connect, email, friend_email)) 
+    {
+        std::cerr << "Error: " << friend_email << " is not your friend\n";
+        return 0;
+    }
+
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "UPDATE " + emailStr + "_list SET type = 'friend' WHERE email = '" + std::string(friend_email) + "'";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error unblocking friend: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
+}
+
+int sql_display_friend(MYSQL* connect, const char* email, std::string& send)
+{
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "SELECT email FROM " + emailStr + "_list WHERE type = 'friend' OR type = 'block'";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error displaying friend: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr) 
+    {
+        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result))) 
+    {
+        send += row[0];
+        send += '\n';
+        std::cout << "-----------------\n";
+        std::cout << row[0] << '\n';
+    }
+
+    mysql_free_result(result);
+    return 1;
+}

@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/mars/code/chatroom/project/client/client.cc" "CMakeFiles/client.dir/project/client/client.cc.o" "gcc" "CMakeFiles/client.dir/project/client/client.cc.o.d"
   "/home/mars/code/chatroom/project/client/client_menu.cc" "CMakeFiles/client.dir/project/client/client_menu.cc.o" "gcc" "CMakeFiles/client.dir/project/client/client_menu.cc.o.d"
+  "/home/mars/code/chatroom/project/client/command_menu.cc" "CMakeFiles/client.dir/project/client/command_menu.cc.o" "gcc" "CMakeFiles/client.dir/project/client/command_menu.cc.o.d"
   "/home/mars/code/chatroom/project/client/mail.cc" "CMakeFiles/client.dir/project/client/mail.cc.o" "gcc" "CMakeFiles/client.dir/project/client/mail.cc.o.d"
   )
 

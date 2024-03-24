@@ -39,7 +39,7 @@ static void ClienthandleRegister(int sfd)
 
     if (!is_valid_email(email.c_str()))
     {
-        std::cout << "邮箱格式不对";
+        std::cout << "邮箱格式不对\n";
         return;
     }
 

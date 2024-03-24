@@ -94,6 +94,8 @@ static void private_chat(int sfd)
         sendMsg(sfd, send.c_str(), send.size(), PRIVATE_MESSAGE);
         std::cin >> msg;
     }
+
+    std::cout << "退出私聊\n";
 }
 
 void commandMenu(int sfd)

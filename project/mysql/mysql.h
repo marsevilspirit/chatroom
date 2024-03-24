@@ -23,11 +23,19 @@ std::string sql_getname(MYSQL* connect, const char* email);
 
 int sql_create_list(MYSQL* connect, const char* email);
 
+int handle_delete_friend(MYSQL* connect, const char* email);
+
 int sql_delete_list(MYSQL* connect, const char* email);
 
 int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email);
 
-bool is_friend(MYSQL* connect, const char* email, const char* friend_email);
+bool is_your_friend_or_request(MYSQL* connect, const char* email, const char* friend_email);
+
+bool is_your_friend(MYSQL* connect, const char* email, const char* friend_email);
+
+bool is_my_friend_or_request(MYSQL* connect, const char* email, const char* friend_email);
+
+bool is_my_friend(MYSQL* connect, const char* email, const char* friend_email);
 
 int sql_request(MYSQL* connect,const char* email,const char* friend_email);//好友申请
 

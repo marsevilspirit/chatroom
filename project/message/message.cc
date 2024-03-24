@@ -295,6 +295,8 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
         return;
     }
 
+    handle_delete_friend(connect, email);
+
     if(sql_delete_list(connect, email) == 0)
     {
         std::cerr << "fail to delete table\n";
@@ -333,8 +335,11 @@ void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
         sendMsg(friend_fd, send.c_str(), send.size(), SERVER_MESSAGE);
     }
 
-    if(!is_friend(connect, email.c_str(), friend_email))
+    if(!is_your_friend_or_request(connect, email.c_str(), friend_email))
+    {
+        std::cout << "send request------------------------------------\n";
         sql_request(connect, email.c_str(), friend_email);//好友申请
+    }
 
     send = "添加好友成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -352,6 +357,13 @@ void ServerhandleDeleteFriend(char* msg, int client_socket, MYSQL* connect)
     std::string send;
 
     if(sql_delete_friend(connect, email.c_str(), friend_email) == 0)
+    {
+        send = "删除好友失败, 该用户不存在或不是好友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    
+    if(sql_delete_friend(connect, friend_email, email.c_str()) == 0)
     {
         send = "删除好友失败, 该用户不存在或不是好友";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -441,6 +453,13 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
     char* message = msg;
 
     std::string send = sql_getname(connect, email.c_str()) + ": \n" + message;
+
+    if(!is_your_friend(connect, email.c_str(), friend_email))
+    {
+        send = "您不是对方好友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
 
     if(sql_if_online(connect, friend_email) == 0)
     {

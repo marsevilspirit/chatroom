@@ -1,5 +1,6 @@
 #include "client_menu.h"
 #include "command_menu.h"
+#include <unistd.h>
 
 #define PORT_NUM 8000
 #define IP "127.0.0.1"
@@ -21,12 +22,16 @@ static void clearInputBuffer()
 void sendMessageThread(int sfd) 
 {
     std::string msg;
+
+    clearInputBuffer();
+
     while (true)
     {
+        std::getline(std::cin, msg); // 读取整行输入
 
-        std::cin >> msg;
+        std::cout << "msg: " << msg << '\n';
 
-        clearInputBuffer();
+        usleep(1000); // 暂停一毫秒
 
         if (msg == "exit")
         {
@@ -44,10 +49,12 @@ void sendMessageThread(int sfd)
         if (sendMsg(sfd, msg.c_str(), msg.size(), GROUP_MESSAGE) == -1) 
         {
             std::cout << "Failed to send message.\n";
-            break;
+            continue;
         }
 
         std::cout << '\n';
+
+        usleep(10000);
     }
 }
 

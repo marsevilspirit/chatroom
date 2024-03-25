@@ -636,6 +636,12 @@ void ServerhandleRequestJoinGroup(char* msg, int client_socket, MYSQL* connect)
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
+    else if(ret == 3)
+    {
+        send = "加入群组失败, 你已经申请或加入";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
 
     send = "申请加入群组成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -714,5 +720,194 @@ void ServerhandleDisplayRequestList(char* msg, int client_socket, MYSQL* connect
         return;
     }
 
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleSetManager(char* msg, int  client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    std::cout << "user want to set manager: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* email = msg;
+
+    std::string send;
+
+    int ret = sql_set_manager(connect, my_email.c_str(), email, group_name);
+
+    if(ret == 2)
+    {
+        send = "设置管理员失败, 该用户不是群成员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 0)
+    {
+        send = "设置管理员失败, 你不是群主";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "设置管理员成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleAddGroup(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    std::cout << "user want to add people in group: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* email = msg;
+
+    std::string send;
+
+    int ret = sql_real_add_group(connect, my_email.c_str(), email, group_name);
+
+    if(ret == 2)
+    {
+        send = "加入群组失败, 不是群主或管理员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 0)
+    {
+        send = "加入群组失败, 数据库错误";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 3)
+    {
+        send = "加入群组失败, 该用户没申请";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "申请加入群组成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleCancelManager(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    std::cout << "user want to cancel manager: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* email = msg;
+
+    std::string send;
+
+    int ret = sql_cancel_manager(connect, my_email.c_str(), email, group_name);
+
+    if(ret == 3)
+    {
+        send = "取消管理员失败, 该用户不是管理员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 2)
+    {
+        send = "你不是群主";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 0)
+    {
+        send = "取消管理员失败, 数据库错误";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "取消管理员成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect)
+{
+    //群主可以踢管理员和普通成员, 管理员只能踢普通成员
+    std::string my_email = hashTable[client_socket];
+    int ret;
+
+    std::cout << "user want to kick somebody: " << client_socket << '\n';
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* email = msg;
+
+    std::string send;
+
+    if(if_group_exist(connect, group_name) == 1)
+    {
+        send = "群组不存在";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return; 
+    }
+
+    if(if_master(connect, my_email.c_str(), group_name)) 
+    {
+        ret = sql_kick_anybody(connect, my_email.c_str(), email, group_name);
+        if(ret == 0)
+        {
+            send = "踢人失败, 数据库错误";
+            sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+            return;
+        }
+        else if(ret == 2)
+        {
+            send = "你不能踢自己";
+            sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+            return;
+        }
+    }
+
+    if(if_manager(connect, my_email.c_str(), group_name))
+    {
+        if(if_master(connect, email, group_name))
+        {
+            send = "你没权力踢群主";
+            sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+            return;
+        }
+
+        ret = sql_kick_normal(connect, my_email.c_str(), email, group_name);
+        if(ret == 0)
+        {
+            send = "踢人失败, 数据库错误";
+            sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+            return;
+        }
+    }
+
+    send = "踢" + std::string(email) + "成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }

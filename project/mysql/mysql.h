@@ -1,6 +1,7 @@
 #include <mysql/mysql.h>
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 
 
 MYSQL* sql_init(MYSQL* connect);
@@ -51,6 +52,8 @@ int sql_display_friend(MYSQL* connect, const char* email, std::string& send);
 
 
 //--------------------------------------------------------------------------------
+int if_group_exist(MYSQL* connect, const char* group_name);
+
 int sql_create_group_list(MYSQL* connect, const char* email);
 
 int sql_delete_group_list(MYSQL* connect, const char* email);
@@ -66,3 +69,18 @@ int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name)
 int sql_display_group(MYSQL* connect, std::string& send);
 
 int sql_display_request_list(MYSQL* connect, const char* my_email, const char* group_name, std::string& send);
+
+int sql_set_manager(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
+
+int sql_real_add_group(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
+
+int sql_cancel_manager(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
+
+int if_master(MYSQL* connect, const char* email, const char* group_name);
+
+int if_manager(MYSQL* connect, const char* email, const char* group_name);
+
+int sql_kick_anybody(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
+
+int sql_kick_normal(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
+

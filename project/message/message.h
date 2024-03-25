@@ -28,6 +28,10 @@ enum Type{
     EXIT_GROUP,
     DISPLAY_GROUP,
     DISPLAY_GROUP_REQUEST,
+    SET_MANAGER,
+    ADD_GROUP,
+    CANCEL_MANAGER,
+    KICK_SOMEBODY,
 };
 
 int sendMsg(int cfd, const char* msg, int len, Type flag);
@@ -67,3 +71,11 @@ void ServerhandleExitGroup(char* msg, int client_socket, MYSQL* connect);
 void ServerhandleDisplayGroupList(int client_socket, MYSQL* connect);
 
 void ServerhandleDisplayRequestList(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleSetManager(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleAddGroup(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleCancelManager(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect);

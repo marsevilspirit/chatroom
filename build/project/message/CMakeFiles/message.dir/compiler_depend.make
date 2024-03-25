@@ -136,6 +136,7 @@ project/message/CMakeFiles/message.dir/__/mysql/mysql.cc.o: /home/mars/code/chat
   /usr/include/c++/13.2.1/cstddef \
   /usr/include/c++/13.2.1/cstdio \
   /usr/include/c++/13.2.1/cstdlib \
+  /usr/include/c++/13.2.1/cstring \
   /usr/include/c++/13.2.1/cwchar \
   /usr/include/c++/13.2.1/cwctype \
   /usr/include/c++/13.2.1/debug/assertions.h \
@@ -203,6 +204,8 @@ project/message/CMakeFiles/message.dir/__/mysql/mysql.cc.o: /home/mars/code/chat
   /usr/include/stdint.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
+  /usr/include/string.h \
+  /usr/include/strings.h \
   /usr/include/sys/cdefs.h \
   /usr/include/sys/select.h \
   /usr/include/sys/single_threaded.h \
@@ -350,6 +353,7 @@ project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o: /home/mars/cod
   /usr/include/c++/13.2.1/cstddef \
   /usr/include/c++/13.2.1/cstdio \
   /usr/include/c++/13.2.1/cstdlib \
+  /usr/include/c++/13.2.1/cstring \
   /usr/include/c++/13.2.1/cwchar \
   /usr/include/c++/13.2.1/cwctype \
   /usr/include/c++/13.2.1/debug/assertions.h \
@@ -417,6 +421,8 @@ project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o: /home/mars/cod
   /usr/include/stdint.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
+  /usr/include/string.h \
+  /usr/include/strings.h \
   /usr/include/sys/cdefs.h \
   /usr/include/sys/select.h \
   /usr/include/sys/single_threaded.h \
@@ -722,9 +728,9 @@ project/message/CMakeFiles/message.dir/message.cc.o: /home/mars/code/chatroom/pr
 
 /usr/include/c++/13.2.1/bits/std_abs.h:
 
-/usr/include/c++/13.2.1/bits/vector.tcc:
-
 /usr/include/c++/13.2.1/cstring:
+
+/usr/include/c++/13.2.1/bits/vector.tcc:
 
 /usr/include/c++/13.2.1/stdlib.h:
 
@@ -1128,6 +1134,8 @@ project/message/CMakeFiles/message.dir/message.cc.o: /home/mars/code/chatroom/pr
 
 /usr/include/stdlib.h:
 
+/usr/include/strings.h:
+
 /usr/include/sys/cdefs.h:
 
 /usr/include/c++/13.2.1/bits/alloc_traits.h:
@@ -1203,5 +1211,3 @@ project/message/CMakeFiles/message.dir/message.cc.o: /home/mars/code/chatroom/pr
 /usr/include/c++/13.2.1/vector:
 
 /usr/include/netinet/in.h:
-
-/usr/include/strings.h:

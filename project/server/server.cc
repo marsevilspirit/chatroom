@@ -144,6 +144,10 @@ void server::handleReceivedMessage(int client_socket)
             case EXIT_GROUP:            ServerhandleExitGroup(msg, client_socket, connect);              break;
             case DISPLAY_GROUP:         ServerhandleDisplayGroupList(client_socket, connect);            break;
             case DISPLAY_GROUP_REQUEST: ServerhandleDisplayRequestList(msg, client_socket, connect);     break;
+            case SET_MANAGER:           ServerhandleSetManager(msg, client_socket, connect);             break;
+            case ADD_GROUP:             ServerhandleAddGroup(msg, client_socket, connect);               break;
+            case CANCEL_MANAGER:        ServerhandleCancelManager(msg, client_socket, connect);          break;
+            case KICK_SOMEBODY:         ServerhandleKickSomebody(msg, client_socket, connect);           break;
             default:                    std::cerr << "Unknown message type\n";                           break;
         }
     }

@@ -166,6 +166,58 @@ static void display_request_list(int sfd)
     sendMsg(sfd, send.c_str(), send.size(), DISPLAY_GROUP_REQUEST);
 }
 
+static void set_manager(int sfd)
+{
+    std::string group_name;
+    std::string email;
+    std::cout << "请输入群聊名称: ";
+    std::cin >> group_name;
+    std::cout << "请输入要设置为管理员的邮箱: ";
+    std::cin >> email;
+
+    std::string send = group_name + " " + email;
+    sendMsg(sfd, send.c_str(), send.size(), SET_MANAGER);
+}
+
+static void add_people_in_group(int sfd)
+{
+    std::string group_name;
+    std::string email;
+    std::cout << "请输入群聊名称: ";
+    std::cin >> group_name;
+    std::cout << "请输入要拉进群的邮箱: ";
+    std::cin >> email;
+
+    std::string send = group_name + " " + email;
+    sendMsg(sfd, send.c_str(), send.size(), ADD_GROUP);
+}
+
+static void cancel_manager(int sfd)
+{
+    std::string group_name;
+    std::string email;
+    std::cout << "请输入群聊名称: ";
+    std::cin >> group_name;
+    std::cout << "请输入要取消管理员的邮箱: ";
+    std::cin >> email;
+
+    std::string send = group_name + " " + email;
+    sendMsg(sfd, send.c_str(), send.size(), CANCEL_MANAGER);
+}
+
+static void kick_somebody(int sfd)
+{
+    std::string group_name;
+    std::string email;
+    std::cout << "请输入群聊名称: ";
+    std::cin >> group_name;
+    std::cout << "请输入要踢出群聊的邮箱: ";
+    std::cin >> email;
+
+    std::string send = group_name + " " + email;
+    sendMsg(sfd, send.c_str(), send.size(), KICK_SOMEBODY);
+}
+
 static void group_menu(int sfd)
 {
     std::cout << "群操作界面\n";
@@ -174,7 +226,7 @@ static void group_menu(int sfd)
     std::cout << "e.群聊列表    f.设置管理员\n";
     std::cout << "g.取消管理员  i.踢人\n";
     std::cout << "j.群聊成员    k.申请列表\n";
-    std::cout << "l.同意进群    m.退出\n";
+    std::cout << "l.拉人进群    m.退出\n";
 
     char command;
     std::cin >> command;
@@ -187,12 +239,12 @@ static void group_menu(int sfd)
         case 'c':    exit_group(sfd);           break;
         case 'd':    delete_group(sfd);         break;
         case 'e':    display_list_group(sfd);   break;
-        case 'f':     break;
-        case 'g':     break;
-        case 'i':     break;
+        case 'f':    set_manager(sfd);          break;
+        case 'g':    cancel_manager(sfd);       break;
+        case 'i':    kick_somebody(sfd);        break;
         case 'j':     break;
         case 'k':    display_request_list(sfd); break;
-        case 'l':     break;
+        case 'l':    add_people_in_group(sfd);  break;
         case 'm':    std::cout << "退出群操作界面\n";         return;
         case 'h': 
                      std::cout << "群操作界面\n";
@@ -201,7 +253,7 @@ static void group_menu(int sfd)
                      std::cout << "e.群聊列表    f.设置管理员\n";
                      std::cout << "g.删除管理员  i.踢人\n";
                      std::cout << "j.群聊成员    k.申请列表\n";
-                     std::cout << "l.同意进群    m.退出\n";
+                     std::cout << "l.拉人进群    m.退出\n";
                      break;
     }
 }

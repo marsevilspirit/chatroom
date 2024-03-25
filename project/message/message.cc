@@ -209,19 +209,21 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
     char* password = msg;
     std::string send;
 
-    if(sql_online(connect, email) == 3)
+    int ret = sql_online(connect, email);
+
+    if(ret == 3)
     {
         send = "账号已登录, 请先退出登录";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_online(connect, email) == 2)
+    else if(ret == 2)
     {
         send = "账号不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_online(connect, email) == 0)
+    else if(ret == 0)
     {
         send = "数据库错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -300,19 +302,21 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
     char* password = msg;
     std::string send;
 
-    if(sql_online(connect, email) == 3)
+    int ret = sql_online(connect, email);
+
+    if(ret == 3)
     {
         send = "账号已登录, 请先退出登录";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_online(connect, email) == 2)
+    else if(ret == 2)
     {
         send = "账号不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_online(connect, email) == 0)
+    else if(ret == 0)
     {
         send = "数据库错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -361,13 +365,15 @@ void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
 
     std::string send;
 
-    if(sql_add_friend(connect, email.c_str(), friend_email) == 2)
+    int ret = sql_add_friend(connect, email.c_str(), friend_email);
+
+    if(ret == 2)
     {
         send = "添加好友失败, 该用户不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_add_friend(connect, email.c_str(), friend_email) == 0)
+    else if(ret == 0)
     {
         send = "添加好友失败, 数据库错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -409,26 +415,15 @@ void ServerhandleDeleteFriend(char* msg, int client_socket, MYSQL* connect)
 
     std::string send;
 
-    if(sql_delete_friend(connect, email.c_str(), friend_email) == 2)
+    int ret = sql_delete_friend(connect, email.c_str(), friend_email);
+
+    if(ret == 2)
     {
         send = "删除好友失败, 该用户不是好友";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_delete_friend(connect, email.c_str(), friend_email) == 0)
-    {
-        send = "删除好友失败, 数据库错误";
-        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
-        return;
-    }
-    
-    if(sql_delete_friend(connect, friend_email, email.c_str()) == 2)
-    {
-        send = "删除好友失败, 该用户不是好友";
-        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
-        return;
-    }
-    else if(sql_delete_friend(connect, friend_email, email.c_str()) == 0)
+    else if(ret == 0)
     {
         send = "删除好友失败, 数据库错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -472,13 +467,15 @@ void ServerhandleUnblockFriend(char* msg, int client_socket, MYSQL* connect)
 
     std::string send;
 
-    if(sql_unblock_friend(connect, email.c_str(), friend_email) == 2)
+    int ret = sql_unblock_friend(connect, email.c_str(), friend_email);
+
+    if(ret == 2)
     {
         send = "解除屏蔽好友失败, 该用户未被屏蔽";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_unblock_friend(connect, email.c_str(), friend_email) == 0)
+    else if(ret == 0)
     {
         send = "解除屏蔽好友失败, 数据库错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -595,13 +592,15 @@ void ServerhandleDeleteGroup(char* msg, int client_socket, MYSQL* connect)
 
     std::string send;
 
-    if(sql_delete_group(connect, email.c_str(), group_name) == 2)
+    int ret = sql_delete_group(connect, email.c_str(), group_name);
+
+    if(ret == 2)
     {
         send = "删除群组失败, 该群组不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_delete_group(connect, email.c_str(), group_name) == 3)
+    else if(ret == 3)
     {
         send = "删除群组失败, 你不是群主";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -612,7 +611,7 @@ void ServerhandleDeleteGroup(char* msg, int client_socket, MYSQL* connect)
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }
 
-void ServerhandleJoinGroup(char* msg, int client_socket, MYSQL* connect)
+void ServerhandleRequestJoinGroup(char* msg, int client_socket, MYSQL* connect)
 {
     std::string my_email = hashTable[client_socket];
 
@@ -623,19 +622,97 @@ void ServerhandleJoinGroup(char* msg, int client_socket, MYSQL* connect)
 
     std::string send;
 
-    if(sql_add_group(connect, my_email.c_str(), group_name) == 2)
+    int ret = sql_add_group(connect, my_email.c_str(), group_name);
+
+    if(ret == 2)
     {
         send = "加入群组失败, 该群组不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
-    else if(sql_add_group(connect, my_email.c_str(), group_name) == 0)
+    else if(ret == 0)
     {
         send = "加入群组失败, 数据库错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
-    send = "加入群组成功";
+    send = "申请加入群组成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleExitGroup(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    std::cout << "user want to exit group: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    std::string send;
+
+    int ret = sql_exit_group(connect, my_email.c_str(), group_name);
+
+    if(ret == 2)
+    {
+        send = "退出群组失败, 该群组不存在";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 3)
+    {
+        send = "退出群组失败, 你是群主，不能退出";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "退出群组成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleDisplayGroupList(int client_socket, MYSQL* connect)
+{
+
+    std::cout << "user want to display group list: " << client_socket << '\n'; 
+
+    std::string send;
+
+    if(sql_display_group(connect, send) == 0)
+    {
+        send = "获取群组列表失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleDisplayRequestList(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    char* group_name = msg;
+
+    std::cout << "user want to display request list: " << client_socket << '\n';
+    std::cout << group_name << '\n';
+
+    std::string send;
+
+    int ret = sql_display_request_list(connect, my_email.c_str(), group_name, send);
+
+    if(ret == 2)
+    {
+        send = "获取请求列表失败, 你不是群主或管理员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 0)
+    {
+        send = "获取请求列表失败, 数据库错误";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }

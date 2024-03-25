@@ -60,3 +60,9 @@ int sql_create_group(MYSQL* connect, const char* email, const char* group_name);
 int sql_delete_group(MYSQL* connect, const char* email, const char* group_name);
 
 int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name);
+
+int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name);
+
+int sql_display_group(MYSQL* connect, std::string& send);
+
+int sql_display_request_list(MYSQL* connect, const char* my_email, const char* group_name, std::string& send);

@@ -29,8 +29,6 @@ void sendMessageThread(int sfd)
     {
         std::getline(std::cin, msg); // 读取整行输入
 
-        std::cout << "msg: " << msg << '\n';
-
         usleep(1000); // 暂停一毫秒
 
         if (msg == "exit")
@@ -68,8 +66,6 @@ void receiveMessageThread(int sfd)
         switch (flag)
         {
             case GROUP_MESSAGE:     std::cout << "GROUP_MESSAGE\n";         break;
-            case LOGIN:             std::cout << "LOGIN\n";                 break;
-            case REGISTER:          std::cout << "REGISTER\n";              break;
             case PRIVATE_MESSAGE:   std::cout << "PRIVATE_MESSAGE\n";       break;
             case SERVER_MESSAGE:    std::cout << "SERVER_MESSAGE\n";        break;
             default:                std::cout << "UNKNOWN\n";               break;

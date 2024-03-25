@@ -127,21 +127,24 @@ void server::handleReceivedMessage(int client_socket)
     {
         switch (flag)
         {
-            case GROUP_MESSAGE:  handleGroupMessage(connect, msg, client_socket, client_sockets); break;
-            case REGISTER:       ServerhandleRegister(msg, client_socket, connect);               break;
-            case LOGIN:          ServerhandleLogin(msg, client_socket, connect);                  break;
-            case FORGET_PASSWD:  ServerhandleForgetPasswd(msg, client_socket, connect);           break;
-            case DELETE_ACCOUNT: ServerhandleDeleteAccount(msg, client_socket, connect);          break;
-            case ADD_FRIEND:     ServerhandleAddFriend(msg, client_socket, connect);              break;
-            case DELETE_FRIEND:  ServerhandleDeleteFriend(msg, client_socket, connect);           break;
-            case BLOCK_FRIEND:   ServerhandleBlockFriend(msg, client_socket, connect);            break;
-            case UNBLOCK_FRIEND: ServerhandleUnblockFriend(msg, client_socket, connect);          break;
-            case DISPLAY_FRIEND: ServerhandleDisplayFriend(msg, client_socket, connect);          break;
-            case PRIVATE_MESSAGE:ServerhandlePrivateMessage(msg, client_socket, connect);         break;
-            case CREATE_GROUP:   ServerhandleCreateGroup(msg, client_socket, connect);            break;
-            case DELETE_GROUP:   ServerhandleDeleteGroup(msg, client_socket, connect);            break;
-            case JOIN_GROUP:     ServerhandleJoinGroup(msg, client_socket, connect);              break;
-            default:             std::cerr << "Unknown message type\n";                           break;
+            case GROUP_MESSAGE:         handleGroupMessage(connect, msg, client_socket, client_sockets); break;
+            case REGISTER:              ServerhandleRegister(msg, client_socket, connect);               break;
+            case LOGIN:                 ServerhandleLogin(msg, client_socket, connect);                  break;
+            case FORGET_PASSWD:         ServerhandleForgetPasswd(msg, client_socket, connect);           break;
+            case DELETE_ACCOUNT:        ServerhandleDeleteAccount(msg, client_socket, connect);          break;
+            case ADD_FRIEND:            ServerhandleAddFriend(msg, client_socket, connect);              break;
+            case DELETE_FRIEND:         ServerhandleDeleteFriend(msg, client_socket, connect);           break;
+            case BLOCK_FRIEND:          ServerhandleBlockFriend(msg, client_socket, connect);            break;
+            case UNBLOCK_FRIEND:        ServerhandleUnblockFriend(msg, client_socket, connect);          break;
+            case DISPLAY_FRIEND:        ServerhandleDisplayFriend(msg, client_socket, connect);          break;
+            case PRIVATE_MESSAGE:       ServerhandlePrivateMessage(msg, client_socket, connect);         break;
+            case CREATE_GROUP:          ServerhandleCreateGroup(msg, client_socket, connect);            break;
+            case DELETE_GROUP:          ServerhandleDeleteGroup(msg, client_socket, connect);            break;
+            case JOIN_GROUP:            ServerhandleRequestJoinGroup(msg, client_socket, connect);       break;
+            case EXIT_GROUP:            ServerhandleExitGroup(msg, client_socket, connect);              break;
+            case DISPLAY_GROUP:         ServerhandleDisplayGroupList(client_socket, connect);            break;
+            case DISPLAY_GROUP_REQUEST: ServerhandleDisplayRequestList(msg, client_socket, connect);     break;
+            default:                    std::cerr << "Unknown message type\n";                           break;
         }
     }
 }

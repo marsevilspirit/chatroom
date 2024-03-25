@@ -12,6 +12,12 @@ void errExit(const char* error)
     exit(EXIT_FAILURE);
 }
 
+static void clearInputBuffer() 
+{
+    std::cin.clear(); // 清除输入状态标志
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // 忽略剩余输入
+}
+
 void sendMessageThread(int sfd) 
 {
     std::string msg;
@@ -19,6 +25,8 @@ void sendMessageThread(int sfd)
     {
 
         std::cin >> msg;
+
+        clearInputBuffer();
 
         if (msg == "exit")
         {

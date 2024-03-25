@@ -2,6 +2,7 @@
 add_library(mysql
     mysql.cc
     mysql.h
+    mysql_group.cc
 )
 
 # 设置头文件路径（如果有头文件的话）

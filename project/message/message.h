@@ -22,6 +22,9 @@ enum Type{
     DISPLAY_FRIEND,
     UNBLOCK_FRIEND,
     PRIVATE_MESSAGE,
+    CREATE_GROUP,
+    DELETE_GROUP,
+    JOIN_GROUP,
 };
 
 int sendMsg(int cfd, const char* msg, int len, Type flag);
@@ -49,3 +52,9 @@ void ServerhandleUnblockFriend(char* msg, int client_socket, MYSQL* connect);
 void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleCreateGroup(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleDeleteGroup(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleJoinGroup(char* msg, int client_socket, MYSQL* connect);

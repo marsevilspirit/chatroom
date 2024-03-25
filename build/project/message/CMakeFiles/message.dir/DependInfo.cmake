@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/mars/code/chatroom/project/mysql/mysql.cc" "project/message/CMakeFiles/message.dir/__/mysql/mysql.cc.o" "gcc" "project/message/CMakeFiles/message.dir/__/mysql/mysql.cc.o.d"
+  "/home/mars/code/chatroom/project/mysql/mysql_group.cc" "project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o" "gcc" "project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o.d"
   "/home/mars/code/chatroom/project/message/message.cc" "project/message/CMakeFiles/message.dir/message.cc.o" "gcc" "project/message/CMakeFiles/message.dir/message.cc.o.d"
   )
 

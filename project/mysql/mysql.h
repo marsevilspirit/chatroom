@@ -48,3 +48,15 @@ int sql_if_block(MYSQL* connect, const char* email, const char* friend_email);
 int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_email);
 
 int sql_display_friend(MYSQL* connect, const char* email, std::string& send);
+
+
+//--------------------------------------------------------------------------------
+int sql_create_group_list(MYSQL* connect, const char* email);
+
+int sql_delete_group_list(MYSQL* connect, const char* email);
+
+int sql_create_group(MYSQL* connect, const char* email, const char* group_name);
+
+int sql_delete_group(MYSQL* connect, const char* email, const char* group_name);
+
+int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name);

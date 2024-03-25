@@ -4,6 +4,7 @@ add_library(message
     message.h
     ../mysql/mysql.cc 
     ../mysql/mysql.h
+    ../mysql/mysql_group.cc
 )
 
 # 设置头文件路径（如果有头文件的话）

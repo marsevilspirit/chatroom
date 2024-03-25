@@ -97,19 +97,35 @@ project/message/CMakeFiles/message.dir/__/mysql/mysql.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/message.dir/__/mysql/mysql.cc.s"
 	cd /home/mars/code/chatroom/build/project/message && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mars/code/chatroom/project/mysql/mysql.cc -o CMakeFiles/message.dir/__/mysql/mysql.cc.s
 
+project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o: project/message/CMakeFiles/message.dir/flags.make
+project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o: /home/mars/code/chatroom/project/mysql/mysql_group.cc
+project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o: project/message/CMakeFiles/message.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o"
+	cd /home/mars/code/chatroom/build/project/message && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o -MF CMakeFiles/message.dir/__/mysql/mysql_group.cc.o.d -o CMakeFiles/message.dir/__/mysql/mysql_group.cc.o -c /home/mars/code/chatroom/project/mysql/mysql_group.cc
+
+project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/message.dir/__/mysql/mysql_group.cc.i"
+	cd /home/mars/code/chatroom/build/project/message && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mars/code/chatroom/project/mysql/mysql_group.cc > CMakeFiles/message.dir/__/mysql/mysql_group.cc.i
+
+project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/message.dir/__/mysql/mysql_group.cc.s"
+	cd /home/mars/code/chatroom/build/project/message && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mars/code/chatroom/project/mysql/mysql_group.cc -o CMakeFiles/message.dir/__/mysql/mysql_group.cc.s
+
 # Object files for target message
 message_OBJECTS = \
 "CMakeFiles/message.dir/message.cc.o" \
-"CMakeFiles/message.dir/__/mysql/mysql.cc.o"
+"CMakeFiles/message.dir/__/mysql/mysql.cc.o" \
+"CMakeFiles/message.dir/__/mysql/mysql_group.cc.o"
 
 # External object files for target message
 message_EXTERNAL_OBJECTS =
 
 project/message/libmessage.a: project/message/CMakeFiles/message.dir/message.cc.o
 project/message/libmessage.a: project/message/CMakeFiles/message.dir/__/mysql/mysql.cc.o
+project/message/libmessage.a: project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o
 project/message/libmessage.a: project/message/CMakeFiles/message.dir/build.make
 project/message/libmessage.a: project/message/CMakeFiles/message.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libmessage.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libmessage.a"
 	cd /home/mars/code/chatroom/build/project/message && $(CMAKE_COMMAND) -P CMakeFiles/message.dir/cmake_clean_target.cmake
 	cd /home/mars/code/chatroom/build/project/message && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/message.dir/link.txt --verbose=$(VERBOSE)
 

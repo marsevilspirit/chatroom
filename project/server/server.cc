@@ -138,6 +138,9 @@ void server::handleReceivedMessage(int client_socket)
             case UNBLOCK_FRIEND: ServerhandleUnblockFriend(msg, client_socket, connect);          break;
             case DISPLAY_FRIEND: ServerhandleDisplayFriend(msg, client_socket, connect);          break;
             case PRIVATE_MESSAGE:ServerhandlePrivateMessage(msg, client_socket, connect);         break;
+            case CREATE_GROUP:   ServerhandleCreateGroup(msg, client_socket, connect);            break;
+            case DELETE_GROUP:   ServerhandleDeleteGroup(msg, client_socket, connect);            break;
+            case JOIN_GROUP:     ServerhandleJoinGroup(msg, client_socket, connect);              break;
             default:             std::cerr << "Unknown message type\n";                           break;
         }
     }

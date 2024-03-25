@@ -186,6 +186,12 @@ void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
         send = "创建好友列表失败";
     }
 
+    if(sql_create_group_list(connect, email) == 0)
+    {
+        std::cerr << "fail to create group table\n";
+        send = "创建群组列表失败";
+    }
+
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }
 
@@ -283,7 +289,7 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
 
     if(sql_online(connect, email) == 0)
     {
-        send = "账号已登录, 请先退出登录";
+        send = "账号已登录, 请先退出登录或无此账号";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
@@ -301,6 +307,14 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
     {
         std::cerr << "fail to delete table\n";
         send = "删除列表失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    if(sql_delete_group_list(connect, email) == 0)
+    {
+        std::cerr << "fail to delete group table\n";
+        send = "删除群组列表失败";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
@@ -452,7 +466,13 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
     msg++;
     char* message = msg;
 
-    std::string send = sql_getname(connect, email.c_str()) + ": \n" + message;
+    //在message后加上发送时间
+    time_t now = time(0);
+    char* dt = ctime(&now);
+    std::string time = dt;
+    time.pop_back();
+
+    std::string send = sql_getname(connect, email.c_str()) + ": ("+ time + ")\n" + message + "\n";
 
     if(!is_your_friend(connect, email.c_str(), friend_email))
     {
@@ -483,4 +503,70 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
             break;
         }
     }
+}
+
+void ServerhandleCreateGroup(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to create group: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    std::string send;
+
+    if(sql_create_group(connect, email.c_str(), group_name) == 0)
+    {
+        send = "创建群组失败, 该群组已存在";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "创建群组成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleDeleteGroup(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to delete group: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    std::string send;
+
+    if(sql_delete_group(connect, email.c_str(), group_name) == 0)
+    {
+        send = "删除群组失败, 该群组不存在或你不是群主";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "删除群组成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleJoinGroup(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    std::cout << "user want to join group: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    std::string send;
+
+    if(sql_add_group(connect, my_email.c_str(), group_name) == 0)
+    {
+        send = "加入群组失败, 该群组不存在或已是成员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    send = "加入群组成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }

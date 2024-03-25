@@ -143,7 +143,7 @@ CMakeFiles/chatroom.dir/all: project/message/CMakeFiles/message.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/chatroom.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 12
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/chatroom.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 0
 .PHONY : CMakeFiles/chatroom.dir/rule
@@ -169,7 +169,7 @@ CMakeFiles/client.dir/all: project/message/CMakeFiles/message.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/client.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/client.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 0
 .PHONY : CMakeFiles/client.dir/rule
@@ -191,12 +191,12 @@ project/server/CMakeFiles/server.dir/all: project/threadpool/CMakeFiles/threadpo
 project/server/CMakeFiles/server.dir/all: project/message/CMakeFiles/message.dir/all
 	$(MAKE) $(MAKESILENT) -f project/server/CMakeFiles/server.dir/build.make project/server/CMakeFiles/server.dir/depend
 	$(MAKE) $(MAKESILENT) -f project/server/CMakeFiles/server.dir/build.make project/server/CMakeFiles/server.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=11,12,13,14 "Built target server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=12,13,14,15 "Built target server"
 .PHONY : project/server/CMakeFiles/server.dir/all
 
 # Build rule for subdir invocation for target.
 project/server/CMakeFiles/server.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 9
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 project/server/CMakeFiles/server.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 0
 .PHONY : project/server/CMakeFiles/server.dir/rule
@@ -217,7 +217,7 @@ project/server/CMakeFiles/server.dir/clean:
 project/threadpool/CMakeFiles/threadpool.dir/all:
 	$(MAKE) $(MAKESILENT) -f project/threadpool/CMakeFiles/threadpool.dir/build.make project/threadpool/CMakeFiles/threadpool.dir/depend
 	$(MAKE) $(MAKESILENT) -f project/threadpool/CMakeFiles/threadpool.dir/build.make project/threadpool/CMakeFiles/threadpool.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=15,16 "Built target threadpool"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=16,17 "Built target threadpool"
 .PHONY : project/threadpool/CMakeFiles/threadpool.dir/all
 
 # Build rule for subdir invocation for target.
@@ -243,12 +243,12 @@ project/threadpool/CMakeFiles/threadpool.dir/clean:
 project/message/CMakeFiles/message.dir/all:
 	$(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/depend
 	$(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=8,9,10 "Built target message"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/mars/code/chatroom/build/CMakeFiles --progress-num=8,9,10,11 "Built target message"
 .PHONY : project/message/CMakeFiles/message.dir/all
 
 # Build rule for subdir invocation for target.
 project/message/CMakeFiles/message.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 project/message/CMakeFiles/message.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/mars/code/chatroom/build/CMakeFiles 0
 .PHONY : project/message/CMakeFiles/message.dir/rule

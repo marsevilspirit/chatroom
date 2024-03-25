@@ -154,6 +154,30 @@ __/mysql/mysql.cc.s:
 	cd /home/mars/code/chatroom/build && $(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/__/mysql/mysql.cc.s
 .PHONY : __/mysql/mysql.cc.s
 
+__/mysql/mysql_group.o: __/mysql/mysql_group.cc.o
+.PHONY : __/mysql/mysql_group.o
+
+# target to build an object file
+__/mysql/mysql_group.cc.o:
+	cd /home/mars/code/chatroom/build && $(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.o
+.PHONY : __/mysql/mysql_group.cc.o
+
+__/mysql/mysql_group.i: __/mysql/mysql_group.cc.i
+.PHONY : __/mysql/mysql_group.i
+
+# target to preprocess a source file
+__/mysql/mysql_group.cc.i:
+	cd /home/mars/code/chatroom/build && $(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.i
+.PHONY : __/mysql/mysql_group.cc.i
+
+__/mysql/mysql_group.s: __/mysql/mysql_group.cc.s
+.PHONY : __/mysql/mysql_group.s
+
+# target to generate assembly for a file
+__/mysql/mysql_group.cc.s:
+	cd /home/mars/code/chatroom/build && $(MAKE) $(MAKESILENT) -f project/message/CMakeFiles/message.dir/build.make project/message/CMakeFiles/message.dir/__/mysql/mysql_group.cc.s
+.PHONY : __/mysql/mysql_group.cc.s
+
 message.o: message.cc.o
 .PHONY : message.o
 
@@ -190,6 +214,9 @@ help:
 	@echo "... __/mysql/mysql.o"
 	@echo "... __/mysql/mysql.i"
 	@echo "... __/mysql/mysql.s"
+	@echo "... __/mysql/mysql_group.o"
+	@echo "... __/mysql/mysql_group.i"
+	@echo "... __/mysql/mysql_group.s"
 	@echo "... message.o"
 	@echo "... message.i"
 	@echo "... message.s"

@@ -1,5 +1,4 @@
 #include "mysql.h"
-#include <mysql/mysql.h>
 
 MYSQL* sql_init(MYSQL* connect)
 {

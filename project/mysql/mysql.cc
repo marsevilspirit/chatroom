@@ -83,7 +83,7 @@ int sql_select(MYSQL* connect, const char* email, const char* password)
     return (count > 0) ? 1 : 0;
 }
 
-int if_exist(MYSQL* connect, const char* email)
+int if_exist(MYSQL* connect, const char* email)// 1存在，0不存在
 {
     std::string query = "SELECT 1 FROM accounts WHERE email ='" + std::string(email) + "' LIMIT 1";
 
@@ -105,8 +105,14 @@ int if_exist(MYSQL* connect, const char* email)
     return (count > 0) ? 1 : 0;
 }
 
-int sql_online(MYSQL* connect, const char* email)
+int sql_online(MYSQL* connect, const char* email)// 1成功，0数据库错误, 2用户不存在, 3用户已登录
 {
+    if(if_exist(connect, email) == 0)//用户不存在
+    {
+        std::cerr << "Error: " << email << " does not exist\n";
+        return 2;
+    }
+
     std::string query = "SELECT 1 FROM accounts WHERE email ='" + std::string(email) + "' AND online_status='0' LIMIT 1";
 
     if (mysql_query(connect, query.c_str()))
@@ -124,7 +130,7 @@ int sql_online(MYSQL* connect, const char* email)
 
     int count = mysql_num_rows(result);
 
-    return (count > 0) ? 1 : 0;
+    return (count > 0) ? 1 : 3;
 }
 
 int sql_if_online(MYSQL* connect, const char* email)
@@ -464,7 +470,7 @@ bool is_my_friend(MYSQL* connect, const char* email, const char* friend_email)
     return true; // 是好友
 }
 
-int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)
+int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)//1成功，0数据库错误, 2用户不存在
 {
     //替换@符号
     std::string emailStr = std::string(email);
@@ -480,7 +486,7 @@ int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)
     if(if_exist(connect, friend_email) == 0)
     {
         std::cerr << "Error: " << friend_email << " does not exist\n";
-        return 0;
+        return 2;
     }
 
     std::string query;
@@ -521,12 +527,12 @@ int sql_request(MYSQL* connect,const char* email,const char* friend_email)
     return 1;
 }
 
-int sql_delete_friend(MYSQL* connect, const char* email, const char* friend_email)
+int sql_delete_friend(MYSQL* connect, const char* email, const char* friend_email)//1成功，0数据库错误, 2不是好友
 {
     if (!is_my_friend(connect, email, friend_email)) 
     {
         std::cerr << "Error: " << friend_email << " is not your friend\n";
-        return 0;
+        return 2;
     }
 
     //替换@符号
@@ -588,12 +594,12 @@ bool is_my_block(MYSQL* connect, const char* email, const char* friend_email)
     return true; // 是好友
 }
 
-int sql_block_friend(MYSQL* connect, const char* email, const char* friend_email)
+int sql_block_friend(MYSQL* connect, const char* email, const char* friend_email)// 1成功，0数据库错误, 2不是好友
 {
     if (!is_my_friend(connect, email, friend_email)) 
     {
         std::cerr << "Error: " << friend_email << " is not your friend\n";
-        return 0;
+        return 2;
     }
 
     //替换@符号
@@ -655,12 +661,12 @@ int sql_if_block(MYSQL* connect, const char* email, const char* friend_email)
     return 1; // type 字段是 "block"，返回 1
 }
 
-int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_email)
+int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_email)//1成功，2没被屏蔽，0数据库错误
 {
     if (!is_my_block(connect, email, friend_email)) 
     {
         std::cerr << "Error: " << friend_email << " is not your block\n";
-        return 0;
+        return 2;
     }
 
     //替换@符号

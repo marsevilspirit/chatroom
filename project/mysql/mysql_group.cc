@@ -162,7 +162,7 @@ int if_master(MYSQL* connect, const char* email, const char* group_name)//0代�
     return 0;
 }
 
-int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)
+int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)//1成功，2不存在，3不是群主
 {
     //替换@符号
     std::string emailStr = std::string(email);
@@ -249,7 +249,7 @@ int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)
     return 1;
 }
 
-int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name)
+int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name)//1成功，2不存在, 0数据库错误
 {
     //替换@符号
     std::string my_emailStr = std::string(my_email);
@@ -265,7 +265,7 @@ int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name)
     if(if_group_exist(connect, group_name) == 1)
     {
         std::cout << "群组不存在\n";
-        return 0;
+        return 2;
     }
 
     std::string query = "INSERT INTO " + my_emailStr + "_group (group_name, status) VALUES ('" + std::string(group_name) + "', 'request');";

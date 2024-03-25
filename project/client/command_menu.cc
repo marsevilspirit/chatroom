@@ -62,12 +62,12 @@ static void friend_menu(int sfd)
 
     switch (command)
     {
-        case '1':     add_friend(sfd);                break; 
-        case '2':     delete_friend(sfd);             break;
-        case '3':     block_friend(sfd);              break;
-        case '4':     unblock_friend(sfd);            break;
-        case '5':     display_friend(sfd);            break;
-        case '6':     std::cout << "exit...";         return;
+        case '1':     add_friend(sfd);                          break; 
+        case '2':     delete_friend(sfd);                       break;
+        case '3':     block_friend(sfd);                        break;
+        case '4':     unblock_friend(sfd);                      break;
+        case '5':     display_friend(sfd);                      break;
+        case '6':     std::cout << "退出好友操作界面\n";        return;
         case 'h': 
                       std::cout << "1.添加好友 2.删除好友\n";
                       std::cout << "3.屏蔽好友 4.解除屏蔽\n";
@@ -78,21 +78,34 @@ static void friend_menu(int sfd)
 
 static void private_chat(int sfd)
 {
-    std::string email;
+    std::string friend_email;
     std::cout << "请输入对方的邮箱: ";
-    std::cin >> email;
+    std::cin >> friend_email;
 
     std::string msg;
-    std::cout << "现在是私聊: \n";
+    std::cout << "进入私聊: \n";
 
-    std::cin >> msg;
+    clearInputBuffer();
 
-    while(msg != "exit")
+    while (msg != "exit")
     {
+        std::getline(std::cin, msg); // 读取整行输入
+
+        std::cout << "msg: " << msg << '\n';
+
+        std::string final_msg = friend_email + " " + msg;
+
+        usleep(1000); // 暂停一毫秒
+
+        if (sendMsg(sfd, final_msg.c_str(), final_msg.size(), PRIVATE_MESSAGE) == -1) 
+        {
+            std::cout << "无效信息，发送失败\n";
+            continue;
+        }
+
         std::cout << '\n';
-        std::string send = email + ' ' + msg;
-        sendMsg(sfd, send.c_str(), send.size(), PRIVATE_MESSAGE);
-        std::cin >> msg;
+
+        usleep(10000);
     }
 
     std::cout << "退出私聊\n";
@@ -153,7 +166,7 @@ static void group_menu(int sfd)
         case 'i':     break;
         case 'j':     break;
         case 'k':     break;
-        case 'l':    std::cout << "exit...";         return;
+        case 'l':    std::cout << "退出群操作界面\n";         return;
         case 'h': 
                      std::cout << "a.创建群聊    b.加入群聊\n";
                      std::cout << "c.退出群聊    d.解散群聊\n";
@@ -187,7 +200,7 @@ void commandMenu(int sfd)
             case '5':     friend_menu(sfd);                break;
             case '6':     group_menu(sfd);                 break;
             case '7':     std::cout << "黑名单未做完\n";     break;
-            case '8':     std::cout << "exit command\n";    return;
+            case '8':     std::cout << "退出command界面\n";    return;
             case 'h': 
                           std::cout << "1.私聊      2.群聊\n";
                           std::cout << "3.发送文件  4.查看文件\n";

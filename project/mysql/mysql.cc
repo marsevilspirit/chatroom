@@ -756,3 +756,136 @@ int sql_display_friend(MYSQL* connect, const char* email, std::string& send)
     mysql_free_result(result);
     return 1;
 }
+
+//file
+int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, const char* sender, const char* resver)//firend 1, not friend 2, database error 0
+{
+    if(is_my_friend(connect, sender, resver)) 
+    {
+        int flag = 0;;
+
+        std::string query = "SELECT 1 FROM file_list WHERE file_name = '" + std::string(file_name) + "' AND sender = '" + std::string(sender) + "' AND resver = '" + std::string(resver) + "'";
+
+        if (mysql_query(connect, query.c_str())) 
+        {
+            std::cerr << "Error checking file: " << mysql_error(connect) << '\n';
+            return 0;
+        }
+
+        MYSQL_RES* result = mysql_store_result(connect);
+
+        if (result == nullptr) 
+        {
+            std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+            return 0;
+        }
+
+        MYSQL_ROW row = mysql_fetch_row(result);
+
+        if (row != nullptr) 
+        {
+            flag = 1;
+        }
+
+        mysql_free_result(result);
+
+        if(flag == 0)
+        {
+            query = "INSERT INTO file_list (file_name, file_path, sender, resver) VALUES ('" + std::string(file_name) + "', '" + std::string(savePath) + "', '" + std::string(sender) + "', '" + std::string(resver) + "')";
+
+            if (mysql_query(connect, query.c_str())) 
+            {
+                std::cerr << "Error inserting file: " << mysql_error(connect) << '\n';
+                return 0;
+            }
+        }
+        else if(flag == 1)
+        {
+            query = "UPDATE file_list SET file_path = '" + std::string(savePath) + "' WHERE file_name = '" + std::string(file_name) + "' AND sender = '" + std::string(sender) + "' AND resver = '" + std::string(resver) + "'";
+
+            if (mysql_query(connect, query.c_str())) 
+            {
+                std::cerr << "Error updating file: " << mysql_error(connect) << '\n';
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    return 0;
+}
+
+int sql_check_file(MYSQL* connect, const char* email, std::string& send)
+{
+    std::string query = "SELECT file_name, sender FROM file_list WHERE resver = '" + std::string(email) + "'";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error checking file: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr) 
+    {
+        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result))) 
+    {
+        send += std::string(row[1]) + " send you a file: " + std::string(row[0]) + '\n';
+    }
+
+    mysql_free_result(result);
+    return 1;
+}
+
+int sql_receive_file(MYSQL* connect, const char* email, const char* sender, const char* file_name, std::string& file_path)
+{
+    std::string query = "SELECT file_path FROM file_list WHERE resver = '" + std::string(email) + "' AND sender = '" + std::string(sender) + "' AND file_name = '" + std::string(file_name) + "'";
+
+    std::cout << query << '\n';
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error receiving file: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+
+    if (result == nullptr) 
+    {
+        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(result);
+
+    if (row == nullptr) 
+    {
+        mysql_free_result(result);
+        return 0;
+    }
+
+    file_path = row[0];
+
+    std::cout << "path" << file_path << '\n';
+
+    mysql_free_result(result);
+
+    /*query = "DELETE FROM file_list WHERE resver = '" + std::string(email) + "' AND sender = '" + std::string(sender) + "' AND file_name = '" + std::string(file_name) + "'";
+
+    std::cout << query << '\n';
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error deleting file: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+    */
+
+    return 1;
+}

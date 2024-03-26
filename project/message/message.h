@@ -38,6 +38,7 @@ enum Type{
     WORLD_MESSAGE,
     SEND_FILE,
     RECEIVE_FILE,
+    CHECK_FILE,
 };
 
 int sendMsg(int cfd, const char* msg, int len, Type flag);
@@ -47,6 +48,8 @@ int recvMsg(int cfd, char** msg, Type* flag);
 int sendFile(int cfd, const char* file_name, const char* file_path, const char* resver);
 
 int recvFile(int cfd, char* buffer, int ret, const char* filename);
+
+void resvFile(const char* msg, const char* file_path);
 
 void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets);
 
@@ -95,3 +98,7 @@ void ServerhandleDisplayGroupMember(char* msg, int client_socket, MYSQL* connect
 void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect);
+
+void ServerhandleCheckFile(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleReceiveFile(char* msg, int client_socket, MYSQL* connect);

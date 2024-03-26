@@ -153,6 +153,8 @@ void server::handleReceivedMessage(int client_socket)
             case DISPLAY_GROUP_MEMBER:  ServerhandleDisplayGroupMember(msg, client_socket, connect);     break;
             case GROUP_MESSAGE:         ServerhandleGroupMessage(msg, client_socket, connect);           break;
             case SEND_FILE:             ServerhandleSendFile(msg, ret, client_socket, connect);          break;
+            case CHECK_FILE:            ServerhandleCheckFile(msg, client_socket, connect);              break;
+            case RECEIVE_FILE:          ServerhandleReceiveFile(msg, client_socket, connect);            break;
             default:                    std::cerr << "Unknown message type\n";                           break;
         }
     }

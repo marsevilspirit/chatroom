@@ -56,6 +56,22 @@ void sendMessageThread(int sfd)
     }
 }
 
+void real_file_resv(char* msg, int sfd, int len)
+{
+    char* to_file_path = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+
+
+    size_t msgSize = len - strlen(to_file_path) - 1; // 加上空格的大小
+
+    recvFile(sfd, msg, len, to_file_path);
+}
+
 void receiveMessageThread(int sfd) 
 {
     char* msg;
@@ -69,6 +85,7 @@ void receiveMessageThread(int sfd)
             case PRIVATE_MESSAGE:   std::cout << "PRIVATE_MESSAGE\n";       break;
             case SERVER_MESSAGE:    std::cout << "SERVER_MESSAGE\n";        break;
             case WORLD_MESSAGE:     std::cout << "WORLD_MESSAGE\n";         break;
+            case SEND_FILE:         real_file_resv(msg, sfd, len);          break;
             default:                std::cout << "UNKNOWN\n";               break;
         }
         if (len == -1) 

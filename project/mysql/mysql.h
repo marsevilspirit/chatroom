@@ -85,3 +85,10 @@ int sql_kick_anybody(MYSQL* connect, const char* my_email, const char* email, co
 int sql_kick_normal(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
 
 int sql_display_group_member(MYSQL* connect, const char* my_email, const char* group_name, std::string& send);
+
+//------------------------------------------------------------------------------file
+int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, const char* sender, const char* resver);
+
+int sql_check_file(MYSQL* connect, const char* email, std::string& send);
+
+int sql_receive_file(MYSQL* connect, const char* email, const char* sender, const char* file_name, std::string& send);

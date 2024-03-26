@@ -331,22 +331,27 @@ void receive_file(int sfd)
     std::cin >> file_name;
 
     std::string file_path;
-    std::cout << "请输入文件路径:";
-    std::cin  >> file_path;
+    std::cout << "请输入文件存储路径: ";
+    std::cin >> file_path;
 
-    std::string send = friend_email + " " + file_name;
+    std::string send = friend_email + " " + file_name + " " + file_path;
 
-    char* buffer = nullptr;
-    recvFile(sfd, buffer, send.size(), file_path.c_str());
+    sendMsg(sfd, send.c_str(), send.size(), RECEIVE_FILE);
+}
+
+void check_file(int sfd)
+{
+    std::string msg = "check_file";
+    sendMsg(sfd, msg.c_str(), msg.size(), CHECK_FILE);
 }
 
 void commandMenu(int sfd)
 {
     std::cout << "command界面\n";
     std::cout << "1.私聊      2.群聊\n";
-    std::cout << "3.发送文件  4.接受文件\n";
+    std::cout << "3.发送文件  4.查看文件\n";
     std::cout << "5.好友操作  6.群操作\n";
-    std::cout << "7.退出\n";
+    std::cout << "7.接收文件  8.退出\n";
 
     while(true)
     {
@@ -359,16 +364,17 @@ void commandMenu(int sfd)
             case '1':     private_chat(sfd);                 break;
             case '2':     group_chat(sfd);                   break;
             case '3':     send_file(sfd);                    break;
-            case '4':     receive_file(sfd);                 break;
+            case '4':     check_file(sfd);                   break;
             case '5':     friend_menu(sfd);                  break;
             case '6':     group_menu(sfd);                   break;
-            case '7':     std::cout << "退出command界面\n";  return;
+            case '7':     receive_file(sfd);                 break;
+            case '8':     std::cout << "退出command界面\n";  return;
             case 'h': 
                           std::cout << "command界面\n";
                           std::cout << "1.私聊      2.群聊\n";
                           std::cout << "3.发送文件  4.查看文件\n";
                           std::cout << "5.好友操作  6.群操作\n";
-                          std::cout << "7.退出\n";
+                          std::cout << "7.接收文件 8.退出\n";
                           break;
         }
     }

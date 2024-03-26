@@ -175,9 +175,51 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     return ret;
 }
 
+// 发送文件函数
+int sendFile(int cfd, const char* file_path, const char* to_file_path)
+{
+    FILE* file = fopen(file_path, "rb");
+    if (!file)
+    {
+        perror("fopen");
+        return -1;
+    }
 
-/*
-int sendFile(int cfd, const char* file_name, const char* file_path, const char* resver)
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // 计算消息总大小
+    size_t msgSize = strlen(to_file_path) + fileSize + 1; // 加上空格的大小
+    char* buffer = (char*)malloc(msgSize);
+    if (!buffer)
+    {
+        perror("malloc");
+        fclose(file);
+        return -1;
+    }
+
+    // 将文件名、文件路径和接收方用户名写入 buffer，中间用空格分隔
+    char* ptr = buffer;
+    strcpy(ptr, to_file_path);
+    ptr += strlen(to_file_path);
+    *ptr = ' ';
+    ptr++;
+
+    // 读取文件内容并写入 buffer
+    fread(ptr, 1, fileSize, file);
+    fclose(file);
+
+    // 发送消息
+    int ret = sendMsg(cfd, buffer, msgSize, SEND_FILE);
+
+    free(buffer);
+
+    return ret;
+}
+
+
+int sendFile(int cfd, const char* file_path)
 {
 
     FILE* file = fopen(file_path, "rb");
@@ -202,21 +244,20 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     fread(buffer, 1, fileSize, file);
     fclose(file);
 
+    std::cout << "buffer: \n" << buffer << '\n';
+
     int ret = sendMsg(cfd, buffer, fileSize, SEND_FILE);
 
     free(buffer);
 
     return ret;
 }
-*/
 
 // 接收文件函数
-int recvFile(int cfd, char* buffer, int ret, const char* filename)
+int recvFile(int cfd, char* buffer, int ret, const char* file_path)
 {
 
-    std::cout << "buffer1:" << buffer << '\n';
-
-    FILE* file = fopen(filename, "wb");
+    FILE* file = fopen(file_path, "wb");
     if (!file)
     {
         perror("fopen");
@@ -1102,8 +1143,6 @@ void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
 
     std::cout << "user want to send file: " << client_socket << '\n'; 
 
-    std::cout << "msg: " << msg << '\n';
-
     char* file_name = msg;
 
     while(*msg != ' ' && *msg != '\0')
@@ -1123,9 +1162,78 @@ void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
     std::cout << "file_name: " << file_name << '\n';
     std::cout << "resver: " << resver << '\n';
 
+
     size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
 
     std::string savePath = "./sever_file/" + sender + "_" + std::string(file_name);
+
+    int ret = sql_file_list(connect, file_name, savePath.c_str(), sender.c_str(), resver);
+
+    if(ret == 0)
+    {
+        std::string send = "发送文件失败，确定对方是你的朋友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
     recvFile(client_socket, msg, msgSize, savePath.c_str());
+
 }
 
+void ServerhandleCheckFile(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to check file: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    std::string send;
+
+    if(sql_check_file(connect, email.c_str(), send) == 0)
+    {
+        send = "获取文件列表失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleReceiveFile(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to receive file: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* friend_email = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* file_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* to_file_path = msg;
+
+
+    std::string send;
+
+    if(sql_receive_file(connect, email.c_str(), friend_email, file_name, send) == 0)
+    {
+        send = "接收文件失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    sendFile(client_socket, send.c_str(), to_file_path);
+
+    send = "接收文件成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}

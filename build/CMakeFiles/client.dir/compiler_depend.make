@@ -122,6 +122,7 @@ CMakeFiles/client.dir/project/client/client.cc.o: /home/mars/code/chatroom/proje
   /usr/include/c++/13.2.1/bits/char_traits.h \
   /usr/include/c++/13.2.1/bits/charconv.h \
   /usr/include/c++/13.2.1/bits/chrono.h \
+  /usr/include/c++/13.2.1/bits/codecvt.h \
   /usr/include/c++/13.2.1/bits/concept_check.h \
   /usr/include/c++/13.2.1/bits/cpp_type_traits.h \
   /usr/include/c++/13.2.1/bits/cxxabi_forced.h \
@@ -131,6 +132,7 @@ CMakeFiles/client.dir/project/client/client.cc.o: /home/mars/code/chatroom/proje
   /usr/include/c++/13.2.1/bits/exception.h \
   /usr/include/c++/13.2.1/bits/exception_defines.h \
   /usr/include/c++/13.2.1/bits/exception_ptr.h \
+  /usr/include/c++/13.2.1/bits/fstream.tcc \
   /usr/include/c++/13.2.1/bits/functexcept.h \
   /usr/include/c++/13.2.1/bits/functional_hash.h \
   /usr/include/c++/13.2.1/bits/hash_bytes.h \
@@ -159,6 +161,7 @@ CMakeFiles/client.dir/project/client/client.cc.o: /home/mars/code/chatroom/proje
   /usr/include/c++/13.2.1/bits/range_access.h \
   /usr/include/c++/13.2.1/bits/refwrap.h \
   /usr/include/c++/13.2.1/bits/requires_hosted.h \
+  /usr/include/c++/13.2.1/bits/sstream.tcc \
   /usr/include/c++/13.2.1/bits/std_abs.h \
   /usr/include/c++/13.2.1/bits/std_mutex.h \
   /usr/include/c++/13.2.1/bits/std_thread.h \
@@ -208,6 +211,7 @@ CMakeFiles/client.dir/project/client/client.cc.o: /home/mars/code/chatroom/proje
   /usr/include/c++/13.2.1/ext/numeric_traits.h \
   /usr/include/c++/13.2.1/ext/string_conversions.h \
   /usr/include/c++/13.2.1/ext/type_traits.h \
+  /usr/include/c++/13.2.1/fstream \
   /usr/include/c++/13.2.1/initializer_list \
   /usr/include/c++/13.2.1/ios \
   /usr/include/c++/13.2.1/iosfwd \
@@ -221,6 +225,7 @@ CMakeFiles/client.dir/project/client/client.cc.o: /home/mars/code/chatroom/proje
   /usr/include/c++/13.2.1/pstl/glue_algorithm_defs.h \
   /usr/include/c++/13.2.1/pstl/pstl_config.h \
   /usr/include/c++/13.2.1/ratio \
+  /usr/include/c++/13.2.1/sstream \
   /usr/include/c++/13.2.1/stdexcept \
   /usr/include/c++/13.2.1/stdlib.h \
   /usr/include/c++/13.2.1/streambuf \
@@ -234,8 +239,10 @@ CMakeFiles/client.dir/project/client/client.cc.o: /home/mars/code/chatroom/proje
   /usr/include/c++/13.2.1/unordered_map \
   /usr/include/c++/13.2.1/vector \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/atomic_word.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++allocator.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++locale.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/ctype_base.h \
@@ -487,6 +494,7 @@ CMakeFiles/client.dir/project/client/client_menu.cc.o: /home/mars/code/chatroom/
   /usr/include/c++/13.2.1/bits/char_traits.h \
   /usr/include/c++/13.2.1/bits/charconv.h \
   /usr/include/c++/13.2.1/bits/chrono.h \
+  /usr/include/c++/13.2.1/bits/codecvt.h \
   /usr/include/c++/13.2.1/bits/concept_check.h \
   /usr/include/c++/13.2.1/bits/cpp_type_traits.h \
   /usr/include/c++/13.2.1/bits/cxxabi_forced.h \
@@ -496,6 +504,7 @@ CMakeFiles/client.dir/project/client/client_menu.cc.o: /home/mars/code/chatroom/
   /usr/include/c++/13.2.1/bits/exception.h \
   /usr/include/c++/13.2.1/bits/exception_defines.h \
   /usr/include/c++/13.2.1/bits/exception_ptr.h \
+  /usr/include/c++/13.2.1/bits/fstream.tcc \
   /usr/include/c++/13.2.1/bits/functexcept.h \
   /usr/include/c++/13.2.1/bits/functional_hash.h \
   /usr/include/c++/13.2.1/bits/hash_bytes.h \
@@ -524,6 +533,7 @@ CMakeFiles/client.dir/project/client/client_menu.cc.o: /home/mars/code/chatroom/
   /usr/include/c++/13.2.1/bits/range_access.h \
   /usr/include/c++/13.2.1/bits/refwrap.h \
   /usr/include/c++/13.2.1/bits/requires_hosted.h \
+  /usr/include/c++/13.2.1/bits/sstream.tcc \
   /usr/include/c++/13.2.1/bits/std_abs.h \
   /usr/include/c++/13.2.1/bits/std_mutex.h \
   /usr/include/c++/13.2.1/bits/std_thread.h \
@@ -573,6 +583,7 @@ CMakeFiles/client.dir/project/client/client_menu.cc.o: /home/mars/code/chatroom/
   /usr/include/c++/13.2.1/ext/numeric_traits.h \
   /usr/include/c++/13.2.1/ext/string_conversions.h \
   /usr/include/c++/13.2.1/ext/type_traits.h \
+  /usr/include/c++/13.2.1/fstream \
   /usr/include/c++/13.2.1/initializer_list \
   /usr/include/c++/13.2.1/ios \
   /usr/include/c++/13.2.1/iosfwd \
@@ -586,6 +597,7 @@ CMakeFiles/client.dir/project/client/client_menu.cc.o: /home/mars/code/chatroom/
   /usr/include/c++/13.2.1/pstl/glue_algorithm_defs.h \
   /usr/include/c++/13.2.1/pstl/pstl_config.h \
   /usr/include/c++/13.2.1/ratio \
+  /usr/include/c++/13.2.1/sstream \
   /usr/include/c++/13.2.1/stdexcept \
   /usr/include/c++/13.2.1/stdlib.h \
   /usr/include/c++/13.2.1/streambuf \
@@ -599,8 +611,10 @@ CMakeFiles/client.dir/project/client/client_menu.cc.o: /home/mars/code/chatroom/
   /usr/include/c++/13.2.1/unordered_map \
   /usr/include/c++/13.2.1/vector \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/atomic_word.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++allocator.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++locale.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/ctype_base.h \
@@ -834,6 +848,7 @@ CMakeFiles/client.dir/project/client/command_menu.cc.o: /home/mars/code/chatroom
   /usr/include/c++/13.2.1/bits/basic_string.tcc \
   /usr/include/c++/13.2.1/bits/char_traits.h \
   /usr/include/c++/13.2.1/bits/charconv.h \
+  /usr/include/c++/13.2.1/bits/codecvt.h \
   /usr/include/c++/13.2.1/bits/concept_check.h \
   /usr/include/c++/13.2.1/bits/cpp_type_traits.h \
   /usr/include/c++/13.2.1/bits/cxxabi_forced.h \
@@ -843,6 +858,7 @@ CMakeFiles/client.dir/project/client/command_menu.cc.o: /home/mars/code/chatroom
   /usr/include/c++/13.2.1/bits/exception.h \
   /usr/include/c++/13.2.1/bits/exception_defines.h \
   /usr/include/c++/13.2.1/bits/exception_ptr.h \
+  /usr/include/c++/13.2.1/bits/fstream.tcc \
   /usr/include/c++/13.2.1/bits/functexcept.h \
   /usr/include/c++/13.2.1/bits/functional_hash.h \
   /usr/include/c++/13.2.1/bits/hash_bytes.h \
@@ -870,6 +886,7 @@ CMakeFiles/client.dir/project/client/command_menu.cc.o: /home/mars/code/chatroom
   /usr/include/c++/13.2.1/bits/range_access.h \
   /usr/include/c++/13.2.1/bits/refwrap.h \
   /usr/include/c++/13.2.1/bits/requires_hosted.h \
+  /usr/include/c++/13.2.1/bits/sstream.tcc \
   /usr/include/c++/13.2.1/bits/std_abs.h \
   /usr/include/c++/13.2.1/bits/stl_algo.h \
   /usr/include/c++/13.2.1/bits/stl_algobase.h \
@@ -912,6 +929,7 @@ CMakeFiles/client.dir/project/client/command_menu.cc.o: /home/mars/code/chatroom
   /usr/include/c++/13.2.1/ext/numeric_traits.h \
   /usr/include/c++/13.2.1/ext/string_conversions.h \
   /usr/include/c++/13.2.1/ext/type_traits.h \
+  /usr/include/c++/13.2.1/fstream \
   /usr/include/c++/13.2.1/initializer_list \
   /usr/include/c++/13.2.1/ios \
   /usr/include/c++/13.2.1/iosfwd \
@@ -923,6 +941,7 @@ CMakeFiles/client.dir/project/client/command_menu.cc.o: /home/mars/code/chatroom
   /usr/include/c++/13.2.1/pstl/execution_defs.h \
   /usr/include/c++/13.2.1/pstl/glue_algorithm_defs.h \
   /usr/include/c++/13.2.1/pstl/pstl_config.h \
+  /usr/include/c++/13.2.1/sstream \
   /usr/include/c++/13.2.1/stdexcept \
   /usr/include/c++/13.2.1/stdlib.h \
   /usr/include/c++/13.2.1/streambuf \
@@ -935,8 +954,10 @@ CMakeFiles/client.dir/project/client/command_menu.cc.o: /home/mars/code/chatroom
   /usr/include/c++/13.2.1/unordered_map \
   /usr/include/c++/13.2.1/vector \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/atomic_word.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++allocator.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++locale.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/ctype_base.h \
@@ -1112,6 +1133,7 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
   /usr/include/c++/13.2.1/bits/char_traits.h \
   /usr/include/c++/13.2.1/bits/charconv.h \
   /usr/include/c++/13.2.1/bits/chrono.h \
+  /usr/include/c++/13.2.1/bits/codecvt.h \
   /usr/include/c++/13.2.1/bits/concept_check.h \
   /usr/include/c++/13.2.1/bits/cpp_type_traits.h \
   /usr/include/c++/13.2.1/bits/cxxabi_forced.h \
@@ -1121,6 +1143,7 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
   /usr/include/c++/13.2.1/bits/exception.h \
   /usr/include/c++/13.2.1/bits/exception_defines.h \
   /usr/include/c++/13.2.1/bits/exception_ptr.h \
+  /usr/include/c++/13.2.1/bits/fstream.tcc \
   /usr/include/c++/13.2.1/bits/functexcept.h \
   /usr/include/c++/13.2.1/bits/functional_hash.h \
   /usr/include/c++/13.2.1/bits/hash_bytes.h \
@@ -1149,6 +1172,7 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
   /usr/include/c++/13.2.1/bits/range_access.h \
   /usr/include/c++/13.2.1/bits/refwrap.h \
   /usr/include/c++/13.2.1/bits/requires_hosted.h \
+  /usr/include/c++/13.2.1/bits/sstream.tcc \
   /usr/include/c++/13.2.1/bits/std_abs.h \
   /usr/include/c++/13.2.1/bits/std_mutex.h \
   /usr/include/c++/13.2.1/bits/std_thread.h \
@@ -1198,6 +1222,7 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
   /usr/include/c++/13.2.1/ext/numeric_traits.h \
   /usr/include/c++/13.2.1/ext/string_conversions.h \
   /usr/include/c++/13.2.1/ext/type_traits.h \
+  /usr/include/c++/13.2.1/fstream \
   /usr/include/c++/13.2.1/initializer_list \
   /usr/include/c++/13.2.1/ios \
   /usr/include/c++/13.2.1/iosfwd \
@@ -1211,6 +1236,7 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
   /usr/include/c++/13.2.1/pstl/glue_algorithm_defs.h \
   /usr/include/c++/13.2.1/pstl/pstl_config.h \
   /usr/include/c++/13.2.1/ratio \
+  /usr/include/c++/13.2.1/sstream \
   /usr/include/c++/13.2.1/stdexcept \
   /usr/include/c++/13.2.1/stdlib.h \
   /usr/include/c++/13.2.1/streambuf \
@@ -1224,8 +1250,10 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
   /usr/include/c++/13.2.1/unordered_map \
   /usr/include/c++/13.2.1/vector \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/atomic_word.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++allocator.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
+  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++locale.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/ctype_base.h \
@@ -1370,8 +1398,6 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/unistd.h:
 
-/usr/include/time.h:
-
 /usr/include/termios.h:
 
 /usr/include/sys/time.h:
@@ -1498,6 +1524,12 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/locale.h:
 
+/usr/include/linux/stddef.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/limits.h:
+
 /usr/include/c++/13.2.1/bits/cxxabi_forced.h:
 
 /usr/include/mysql/mysql_time.h:
@@ -1524,11 +1556,7 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/bits/wctype-wchar.h:
 
-/usr/include/c++/13.2.1/bits/erase_if.h:
-
-/home/mars/code/chatroom/project/client/client_menu.h:
-
-/usr/include/c++/13.2.1/bits/postypes.h:
+/usr/include/c++/13.2.1/cstdlib:
 
 /usr/include/bits/types/wint_t.h:
 
@@ -1572,6 +1600,10 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/mutex:
 
+/usr/include/linux/posix_types.h:
+
+/usr/include/bits/types/FILE.h:
+
 /usr/include/c++/13.2.1/bits/locale_facets.h:
 
 /usr/include/bits/timex.h:
@@ -1596,8 +1628,6 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/bits/ostream_insert.h:
 
-/usr/include/c++/13.2.1/string:
-
 /usr/include/openssl/bioerr.h:
 
 /usr/include/asm-generic/sockios.h:
@@ -1617,6 +1647,8 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 /usr/include/bits/floatn-common.h:
 
 /usr/include/c++/13.2.1/bits/stl_uninitialized.h:
+
+/usr/include/c++/13.2.1/bits/sstream.tcc:
 
 /usr/include/c++/13.2.1/string_view:
 
@@ -1661,8 +1693,6 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 /usr/include/c++/13.2.1/cstring:
 
 /usr/include/auth-client.h:
-
-/usr/include/linux/limits.h:
 
 /usr/include/bits/sockaddr.h:
 
@@ -1762,10 +1792,6 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/bits/basic_ios.tcc:
 
-/usr/include/bits/types/FILE.h:
-
-/usr/include/linux/posix_types.h:
-
 /usr/include/openssl/evperr.h:
 
 /usr/include/bits/termios-c_oflag.h:
@@ -1792,6 +1818,12 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/bits/cxxabi_init_exception.h:
 
+/home/mars/code/chatroom/project/client/client_menu.h:
+
+/usr/include/c++/13.2.1/bits/erase_if.h:
+
+/usr/include/c++/13.2.1/bits/postypes.h:
+
 /usr/include/bits/pthreadtypes-arch.h:
 
 /usr/include/c++/13.2.1/bits/range_access.h:
@@ -1805,6 +1837,8 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 /usr/include/bits/types/cookie_io_functions_t.h:
 
 /usr/include/c++/13.2.1/debug/debug.h:
+
+/usr/include/c++/13.2.1/bits/codecvt.h:
 
 /usr/include/bits/socket.h:
 
@@ -1823,6 +1857,10 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 /usr/include/bits/types/struct___jmp_buf_tag.h:
 
 /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/atomic_word.h:
+
+/usr/include/c++/13.2.1/iosfwd:
+
+/usr/include/asm/socket.h:
 
 /usr/include/mysql/my_compress.h:
 
@@ -1894,13 +1932,15 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/bits/exception_defines.h:
 
+/usr/include/c++/13.2.1/bits/fstream.tcc:
+
+/usr/include/c++/13.2.1/bits/uses_allocator.h:
+
 /usr/include/bits/uio_lim.h:
 
 /usr/include/c++/13.2.1/bits/functexcept.h:
 
 /usr/include/c++/13.2.1/bits/functional_hash.h:
-
-/usr/include/linux/stddef.h:
 
 /usr/include/sys/ttydefaults.h:
 
@@ -1982,6 +2022,12 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/features-time64.h:
 
+/usr/include/libesmtp.h:
+
+/usr/include/c++/13.2.1/bits/locale_classes.h:
+
+/usr/include/c++/13.2.1/bits/stl_pair.h:
+
 /usr/include/c++/13.2.1/bits/stl_tempbuf.h:
 
 /usr/include/c++/13.2.1/bits/stringfwd.h:
@@ -1994,15 +2040,7 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/bits/unordered_map.h:
 
-/usr/include/c++/13.2.1/bits/uses_allocator.h:
-
 /usr/include/c++/13.2.1/cctype:
-
-/usr/include/c++/13.2.1/cstdlib:
-
-/usr/include/asm/socket.h:
-
-/usr/include/c++/13.2.1/iosfwd:
 
 /usr/include/c++/13.2.1/ctime:
 
@@ -2025,6 +2063,12 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 /usr/include/c++/13.2.1/ext/string_conversions.h:
 
 /usr/include/c++/13.2.1/ext/type_traits.h:
+
+/usr/include/c++/13.2.1/string:
+
+/usr/include/c++/13.2.1/fstream:
+
+/usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++locale.h:
 
 /usr/include/c++/13.2.1/bits/ostream.tcc:
 
@@ -2050,6 +2094,10 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/ratio:
 
+/usr/include/time.h:
+
+/usr/include/c++/13.2.1/sstream:
+
 /usr/include/bits/termios.h:
 
 /usr/include/c++/13.2.1/stdexcept:
@@ -2064,13 +2112,15 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 
 /usr/include/c++/13.2.1/vector:
 
+/usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/basic_file.h:
+
 /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++allocator.h:
 
 /home/mars/code/chatroom/project/mysql/mysql.h:
 
 /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++config.h:
 
-/usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++locale.h:
+/usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++io.h:
 
 /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/ctype_inline.h:
 
@@ -2085,11 +2135,3 @@ CMakeFiles/client.dir/project/client/mail.cc.o: /home/mars/code/chatroom/project
 /usr/include/bits/getopt_posix.h:
 
 /usr/include/errno.h:
-
-/usr/include/c++/13.2.1/bits/locale_classes.h:
-
-/usr/include/c++/13.2.1/bits/stl_pair.h:
-
-/usr/include/libesmtp.h:
-
-/usr/include/limits.h:

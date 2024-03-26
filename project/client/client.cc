@@ -44,7 +44,7 @@ void sendMessageThread(int sfd)
             continue;
         }
 
-        if (sendMsg(sfd, msg.c_str(), msg.size(), GROUP_MESSAGE) == -1) 
+        if (sendMsg(sfd, msg.c_str(), msg.size(), WORLD_MESSAGE) == -1) 
         {
             std::cout << "无效信息，发送失败\n";
             continue;
@@ -68,6 +68,7 @@ void receiveMessageThread(int sfd)
             case GROUP_MESSAGE:     std::cout << "GROUP_MESSAGE\n";         break;
             case PRIVATE_MESSAGE:   std::cout << "PRIVATE_MESSAGE\n";       break;
             case SERVER_MESSAGE:    std::cout << "SERVER_MESSAGE\n";        break;
+            case WORLD_MESSAGE:     std::cout << "WORLD_MESSAGE\n";         break;
             default:                std::cout << "UNKNOWN\n";               break;
         }
         if (len == -1) 

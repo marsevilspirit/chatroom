@@ -218,6 +218,16 @@ static void kick_somebody(int sfd)
     sendMsg(sfd, send.c_str(), send.size(), KICK_SOMEBODY);
 }
 
+static void display_group_member(int sfd)
+{
+    std::string group_name;
+    std::cout << "请输入群聊名称: ";
+    std::cin >> group_name;
+
+    std::string send = group_name;
+    sendMsg(sfd, send.c_str(), send.size(), DISPLAY_GROUP_MEMBER);
+}
+
 static void group_menu(int sfd)
 {
     std::cout << "群操作界面\n";
@@ -242,7 +252,7 @@ static void group_menu(int sfd)
         case 'f':    set_manager(sfd);          break;
         case 'g':    cancel_manager(sfd);       break;
         case 'i':    kick_somebody(sfd);        break;
-        case 'j':     break;
+        case 'j':    display_group_member(sfd); break;
         case 'k':    display_request_list(sfd); break;
         case 'l':    add_people_in_group(sfd);  break;
         case 'm':    std::cout << "退出群操作界面\n";         return;
@@ -258,13 +268,85 @@ static void group_menu(int sfd)
     }
 }
 
+void group_chat(int sfd)
+{
+    std::string group_name;
+    std::cout << "请输入群聊名称: ";
+    std::cin >> group_name;
+
+    std::string msg;
+    std::cout << "进入群聊: \n";
+
+    clearInputBuffer();
+
+    while (msg != "exit")
+    {
+        std::getline(std::cin, msg); // 读取整行输入
+
+        std::cout << "msg: " << msg << '\n';
+
+        std::string final_msg = group_name + " " + msg;
+
+        usleep(1000); // 暂停一毫秒
+
+        if (sendMsg(sfd, final_msg.c_str(), final_msg.size(), GROUP_MESSAGE) == -1) 
+        {
+            std::cout << "无效信息，发送失败\n";
+            continue;
+        }
+
+        std::cout << '\n';
+
+        usleep(10000);
+    }
+
+    std::cout << "退出群聊\n";
+}
+
+void send_file(int sfd)
+{
+    std::string resver;
+    std::cout << "请输入对方的邮箱: ";
+    std::cin >> resver;
+
+    std::string file_path;
+    std::cout << "请输入文件路径: ";
+    std::cin >> file_path;
+
+    std::string file_name;
+    std::cout << "请输入文件名: ";
+    std::cin >> file_name;
+
+    sendFile(sfd, file_name.c_str(), file_path.c_str(), resver.c_str());
+}
+
+void receive_file(int sfd)
+{
+    std::string friend_email;
+    std::cout << "请输入对方的邮箱: ";
+    std::cin >> friend_email;
+
+    std::string file_name;
+    std::cout << "请输入文件名: ";
+    std::cin >> file_name;
+
+    std::string file_path;
+    std::cout << "请输入文件路径:";
+    std::cin  >> file_path;
+
+    std::string send = friend_email + " " + file_name;
+
+    char* buffer = nullptr;
+    recvFile(sfd, buffer, send.size(), file_path.c_str());
+}
+
 void commandMenu(int sfd)
 {
     std::cout << "command界面\n";
     std::cout << "1.私聊      2.群聊\n";
-    std::cout << "3.发送文件  4.查看文件\n";
+    std::cout << "3.发送文件  4.接受文件\n";
     std::cout << "5.好友操作  6.群操作\n";
-    std::cout << "7.黑名单    8.退出\n";
+    std::cout << "7.退出\n";
 
     while(true)
     {
@@ -274,20 +356,19 @@ void commandMenu(int sfd)
 
         switch (command)
         {
-            case '1':     private_chat(sfd);               break;
-            case '2':     std::cout << "群聊未做完\n";       break;
-            case '3':     std::cout << "发送文件未做完\n";   break;
-            case '4':     std::cout << "查看文件未做完\n";   break;
-            case '5':     friend_menu(sfd);                break;
-            case '6':     group_menu(sfd);                 break;
-            case '7':     std::cout << "黑名单未做完\n";     break;
-            case '8':     std::cout << "退出command界面\n";    return;
+            case '1':     private_chat(sfd);                 break;
+            case '2':     group_chat(sfd);                   break;
+            case '3':     send_file(sfd);                    break;
+            case '4':     receive_file(sfd);                 break;
+            case '5':     friend_menu(sfd);                  break;
+            case '6':     group_menu(sfd);                   break;
+            case '7':     std::cout << "退出command界面\n";  return;
             case 'h': 
                           std::cout << "command界面\n";
                           std::cout << "1.私聊      2.群聊\n";
                           std::cout << "3.发送文件  4.查看文件\n";
                           std::cout << "5.好友操作  6.群操作\n";
-                          std::cout << "7.黑名单    8.退出\n";
+                          std::cout << "7.退出\n";
                           break;
         }
     }

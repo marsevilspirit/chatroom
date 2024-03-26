@@ -128,7 +128,109 @@ int recvMsg(int cfd, char** msg, Type* flag)
     return ret;
 }
 
-void handleGroupMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets)
+// 发送文件函数
+int sendFile(int cfd, const char* file_name, const char* file_path, const char* resver)
+{
+    FILE* file = fopen(file_path, "rb");
+    if (!file)
+    {
+        perror("fopen");
+        return -1;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // 计算消息总大小
+    size_t msgSize = strlen(file_name) + strlen(resver) + fileSize + 2; // 加上空格的大小
+    char* buffer = (char*)malloc(msgSize);
+    if (!buffer)
+    {
+        perror("malloc");
+        fclose(file);
+        return -1;
+    }
+
+    // 将文件名、文件路径和接收方用户名写入 buffer，中间用空格分隔
+    char* ptr = buffer;
+    strcpy(ptr, file_name);
+    ptr += strlen(file_name);
+    *ptr = ' ';
+    ptr++;
+    strcpy(ptr, resver);
+    ptr += strlen(resver);
+    *ptr = ' ';
+    ptr++;
+
+    // 读取文件内容并写入 buffer
+    fread(ptr, 1, fileSize, file);
+    fclose(file);
+
+    // 发送消息
+    int ret = sendMsg(cfd, buffer, msgSize, SEND_FILE);
+
+    free(buffer);
+
+    return ret;
+}
+
+
+/*
+int sendFile(int cfd, const char* file_name, const char* file_path, const char* resver)
+{
+
+    FILE* file = fopen(file_path, "rb");
+    if (!file)
+    {
+        perror("fopen");
+        return -1;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* buffer = (char*)malloc(fileSize);
+    if (!buffer)
+    {
+        perror("malloc");
+        fclose(file);
+        return -1;
+    }
+
+    fread(buffer, 1, fileSize, file);
+    fclose(file);
+
+    int ret = sendMsg(cfd, buffer, fileSize, SEND_FILE);
+
+    free(buffer);
+
+    return ret;
+}
+*/
+
+// 接收文件函数
+int recvFile(int cfd, char* buffer, int ret, const char* filename)
+{
+
+    std::cout << "buffer1:" << buffer << '\n';
+
+    FILE* file = fopen(filename, "wb");
+    if (!file)
+    {
+        perror("fopen");
+        free(buffer);
+        return -1;
+    }
+
+    fwrite(buffer, 1, ret, file);
+
+    fclose(file);
+    return 0;
+}
+
+void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets)
 {
     std::cout << "Received message from client: " << hashTable[client_socket] << '\n';
     std::cout << msg << '\n';
@@ -141,7 +243,7 @@ void handleGroupMessage(MYSQL* connect, char* msg, int client_socket, std::vecto
             continue;
 
         if(socket != client_socket)
-            sendMsg(socket, send.c_str(), send.size(), GROUP_MESSAGE);
+            sendMsg(socket, send.c_str(), send.size(), WORLD_MESSAGE);
     }
     free(msg);   
 }
@@ -323,9 +425,9 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
         return;
     }
 
-    if(delete_account(connect, email) == 0)
+    if(delete_account(connect, email, password) == 0)
     {
-        send = "删除账号失败";
+        send = "删除账号失败, 密码错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
@@ -911,3 +1013,119 @@ void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect)
     send = "踢" + std::string(email) + "成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }
+
+void ServerhandleDisplayGroupMember(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    std::cout << "user want to display group member: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    std::string send;
+
+    int ret = sql_display_group_member(connect, my_email.c_str(), group_name, send);
+
+    if(ret == 0)
+    {
+        send = "获取群成员失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 2)
+    {
+        send = "你不是群成员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+    }
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string my_email = hashTable[client_socket];
+
+    std::cout << "user want to send group message: " << client_socket << '\n'; 
+
+    char* group_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+    char* message = msg;
+
+    //在message后加上发送时间
+    time_t now = time(0);
+    char* dt = ctime(&now);
+    std::string time = dt;
+    time.pop_back();
+
+    std::string send = sql_getname(connect, my_email.c_str()) + ": ("+ time + ")\n" + message + "\n";
+
+    if(if_group_exist(connect, group_name) == 1)
+    {
+        send = "群组不存在";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    std::string group_member;
+
+    int ret = sql_display_group_member(connect, my_email.c_str(), group_name, group_member);
+
+    if(ret == 0)
+    {
+        send = "获取群成员失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 2)
+    {
+        send = "你不是群成员";
+    }
+
+    for (const auto& socket : hashTable)
+    {
+        if (socket.first != client_socket && group_member.find(socket.second) != std::string::npos)
+        {
+            sendMsg(socket.first, send.c_str(), send.size(), GROUP_MESSAGE);
+        }
+    }
+}
+
+void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
+{
+    std::string sender = hashTable[client_socket];
+
+    std::cout << "user want to send file: " << client_socket << '\n'; 
+
+    std::cout << "msg: " << msg << '\n';
+
+    char* file_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+
+    char* resver = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+
+    std::cout << "file_name: " << file_name << '\n';
+    std::cout << "resver: " << resver << '\n';
+
+    size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
+
+    std::string savePath = "./sever_file/" + sender + "_" + std::string(file_name);
+    recvFile(client_socket, msg, msgSize, savePath.c_str());
+}
+

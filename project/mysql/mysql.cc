@@ -30,6 +30,18 @@ MYSQL* sql_init(MYSQL* connect)
     {
         std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
     }
+     
+    query = "CREATE TABLE IF NOT EXISTS group_list (group_name VARCHAR(255) PRIMARY KEY);";
+    if (mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+    }
+
+    query = "CREATE TABLE IF NOT EXISTS file_list (file_name VARCHAR(255) NOT NULL, file_path VARCHAR(255) NOT NULL, sender VARCHAR(255) NOT NULL, resver VARCHAR(255) NOT NULL)";
+    if (mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+    }
 
     std::cout << "database ready\n";
 
@@ -181,9 +193,16 @@ int update_passwd(MYSQL* connect, const char* email, const char* password)
     return 1;
 }
 
-int delete_account(MYSQL* connect, const char* email)
+int delete_account(MYSQL* connect, const char* email, const char* password)
 {
-    std::string query = "DELETE FROM accounts WHERE email = '" + std::string(email) + "'";
+    //检查 email 和 password 是否匹配
+    if(sql_select(connect, email, password) == 0)
+    {
+        std::cerr << "Error: " << email << " and " << password << " does not match\n";
+        return 0;
+    }
+
+    std::string query = "DELETE FROM accounts WHERE email = '" + std::string(email) + "';"; 
 
     if(mysql_query(connect, query.c_str()))
     {

@@ -14,6 +14,8 @@
 #include <libesmtp.h>
 #include <openssl/ssl.h>
 #include <termios.h>
+#include <openssl/evp.h>
+#include <openssl/sha.h>
 #include "../message/message.h"
 
 void enterChatroom(int sfd);

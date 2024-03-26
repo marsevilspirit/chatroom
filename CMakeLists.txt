@@ -23,7 +23,7 @@ add_executable(client
 
 target_link_libraries(chatroom server)
 
-target_link_libraries(client message -lesmtp -lmysqlclient)
+target_link_libraries(client message -lesmtp -lmysqlclient -lssl -lcrypto -lpthread)
 
 #target_include_directories(chatroom
 #    PUBLIC

@@ -212,4 +212,9 @@ project/server/CMakeFiles/server.dir/server.cc.o: \
  /usr/include/c++/13.2.1/bits/allocated_ptr.h \
  /usr/include/c++/13.2.1/ext/concurrence.h \
  /home/mars/code/chatroom/project/server/../message/message.h \
+ /usr/include/c++/13.2.1/fstream /usr/include/c++/13.2.1/bits/codecvt.h \
+ /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
+ /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
+ /usr/include/c++/13.2.1/bits/fstream.tcc /usr/include/c++/13.2.1/sstream \
+ /usr/include/c++/13.2.1/bits/sstream.tcc \
  /home/mars/code/chatroom/project/server/../message/../mysql/mysql.h

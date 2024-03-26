@@ -94,6 +94,8 @@ void server::handleReceivedMessage(int client_socket)
     Type flag;
     char* msg = nullptr;
     int ret = recvMsg(client_socket, &msg, &flag);
+    std::cout << "flag: " << flag << '\n';
+    std::cout << "ret: " << ret << '\n';
     if(ret == -1)
     {
         std::cerr << "Failed to receive message from client_socket: " << client_socket << '\n';
@@ -127,7 +129,7 @@ void server::handleReceivedMessage(int client_socket)
     {
         switch (flag)
         {
-            case GROUP_MESSAGE:         handleGroupMessage(connect, msg, client_socket, client_sockets); break;
+            case WORLD_MESSAGE:         handleWorldMessage(connect, msg, client_socket, client_sockets); break;
             case REGISTER:              ServerhandleRegister(msg, client_socket, connect);               break;
             case LOGIN:                 ServerhandleLogin(msg, client_socket, connect);                  break;
             case FORGET_PASSWD:         ServerhandleForgetPasswd(msg, client_socket, connect);           break;
@@ -148,6 +150,9 @@ void server::handleReceivedMessage(int client_socket)
             case ADD_GROUP:             ServerhandleAddGroup(msg, client_socket, connect);               break;
             case CANCEL_MANAGER:        ServerhandleCancelManager(msg, client_socket, connect);          break;
             case KICK_SOMEBODY:         ServerhandleKickSomebody(msg, client_socket, connect);           break;
+            case DISPLAY_GROUP_MEMBER:  ServerhandleDisplayGroupMember(msg, client_socket, connect);     break;
+            case GROUP_MESSAGE:         ServerhandleGroupMessage(msg, client_socket, connect);           break;
+            case SEND_FILE:             ServerhandleSendFile(msg, ret, client_socket, connect);          break;
             default:                    std::cerr << "Unknown message type\n";                           break;
         }
     }

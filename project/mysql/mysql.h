@@ -18,7 +18,7 @@ int update_online_status(MYSQL* connect, const char* email, int status);
 
 int update_passwd(MYSQL* connect, const char* email, const char* password);
 
-int delete_account(MYSQL* connect, const char* email);
+int delete_account(MYSQL* connect, const char* email, const char* password);
 
 std::string sql_getname(MYSQL* connect, const char* email);
 
@@ -84,3 +84,4 @@ int sql_kick_anybody(MYSQL* connect, const char* my_email, const char* email, co
 
 int sql_kick_normal(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
 
+int sql_display_group_member(MYSQL* connect, const char* my_email, const char* group_name, std::string& send);

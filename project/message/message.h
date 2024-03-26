@@ -7,6 +7,8 @@
 #include <cerrno>
 #include <vector>
 #include <unordered_map>
+#include <fstream>
+#include <sstream>
 #include "../mysql/mysql.h"
 
 enum Type{
@@ -32,13 +34,21 @@ enum Type{
     ADD_GROUP,
     CANCEL_MANAGER,
     KICK_SOMEBODY,
+    DISPLAY_GROUP_MEMBER,
+    WORLD_MESSAGE,
+    SEND_FILE,
+    RECEIVE_FILE,
 };
 
 int sendMsg(int cfd, const char* msg, int len, Type flag);
 
 int recvMsg(int cfd, char** msg, Type* flag);
 
-void handleGroupMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets);
+int sendFile(int cfd, const char* file_name, const char* file_path, const char* resver);
+
+int recvFile(int cfd, char* buffer, int ret, const char* filename);
+
+void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets);
 
 void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect);
 
@@ -79,3 +89,9 @@ void ServerhandleAddGroup(char* msg, int client_socket, MYSQL* connect);
 void ServerhandleCancelManager(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleDisplayGroupMember(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect);

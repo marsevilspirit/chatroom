@@ -106,11 +106,54 @@ static void ClienthandleRegister(int sfd)
         return;
     }
 
+    // 使用SHA-256哈希函数对密码进行加密
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    if (!ctx)
+    {
+        std::cerr << "创建EVP_MD_CTX失败\n";
+        return;
+    }
+
+    if (!EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr))
+    {
+        std::cerr << "初始化哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    if (!EVP_DigestUpdate(ctx, passwd.c_str(), passwd.size()))
+    {
+        std::cerr << "更新哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hashLen;
+    if (!EVP_DigestFinal_ex(ctx, hash, &hashLen))
+    {
+        std::cerr << "完成哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    EVP_MD_CTX_free(ctx);
+
+    // 将哈希值转换为十六进制字符串
+    std::string hashedPasswd;
+    char hexHash[hashLen * 2 + 1];
+    for (unsigned int i = 0; i < hashLen; i++)
+    {
+        sprintf(hexHash + (i * 2), "%02x", hash[i]);
+    }
+    hexHash[hashLen * 2] = '\0';
+    hashedPasswd = hexHash;
+
     std::cout << "设置密码成功，输入你的名称: ";
     std::string name;
     std::cin >> name;
 
-    std::string msg = email + " " + passwd + " " + name;
+    std::string msg = email + " " + hashedPasswd + " " + name;
 
 
     sendMsg(sfd, msg.c_str(), msg.size(), REGISTER);
@@ -151,7 +194,50 @@ static int ClienthandleLogin(int sfd)
 
     std::cout << '\n'; // 输出换行
 
-    std::string msg = email + ' ' + passwd;
+        // 使用SHA-256哈希函数对密码进行加密
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    if (!ctx)
+    {
+        std::cerr << "创建EVP_MD_CTX失败\n";
+        return 0;
+    }
+
+    if (!EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr))
+    {
+        std::cerr << "初始化哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return 0;
+    }
+
+    if (!EVP_DigestUpdate(ctx, passwd.c_str(), passwd.size()))
+    {
+        std::cerr << "更新哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return 0;
+    }
+
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hashLen;
+    if (!EVP_DigestFinal_ex(ctx, hash, &hashLen))
+    {
+        std::cerr << "完成哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return 0;
+    }
+
+    EVP_MD_CTX_free(ctx);
+
+    // 将哈希值转换为十六进制字符串
+    std::string hashedPasswd;
+    char hexHash[hashLen * 2 + 1];
+    for (unsigned int i = 0; i < hashLen; i++)
+    {
+        sprintf(hexHash + (i * 2), "%02x", hash[i]);
+    }
+    hexHash[hashLen * 2] = '\0';
+    hashedPasswd = hexHash;
+
+    std::string msg = email + ' ' + hashedPasswd;
 
     sendMsg(sfd, msg.c_str(), msg.size(), LOGIN);
 

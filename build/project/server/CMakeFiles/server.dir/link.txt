@@ -1,2 +1,0 @@
-/usr/bin/ar qc libserver.a CMakeFiles/server.dir/server.cc.o CMakeFiles/server.dir/__/threadpool/threadpool.cc.o CMakeFiles/server.dir/__/mysql/mysql.cc.o
-/usr/bin/ranlib libserver.a

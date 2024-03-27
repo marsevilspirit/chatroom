@@ -941,7 +941,7 @@ int sql_friend_history(MYSQL* connect, const char* email, const char* friend_ema
     return 1;
 }
 
-int add_friend_message_list(MYSQL* connect, const char* email, const char* friend_email, const char* message, const char* time)
+int add_friend_message_list(MYSQL* connect, const char* email, const char* friend_email, const char* message)
 {
     std::string query = "INSERT INTO friend_message_list(sender, resver, message, time) VALUES('" + std::string(email) + "', '" + std::string(friend_email) + "', '" + std::string(message) + "', NOW());";
 
@@ -954,7 +954,7 @@ int add_friend_message_list(MYSQL* connect, const char* email, const char* frien
     return 1;
 }
 
-int add_group_message_list(MYSQL* connect, const char* email, const char* group_name, const char* message, const char* time)
+int add_group_message_list(MYSQL* connect, const char* email, const char* group_name, const char* message)
 {
     std::string query = "INSERT INTO group_message_list(group_name, sender, message, time) VALUES('" + std::string(group_name) + "', '" + std::string(email) + "', '" + std::string(message) + "', NOW());";
 

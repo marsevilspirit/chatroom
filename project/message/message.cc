@@ -686,7 +686,7 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
     }
 
 
-    add_friend_message_list(connect, email.c_str(), friend_email, message,time.c_str());
+    add_friend_message_list(connect, email.c_str(), friend_email, message);
 
     if(sql_if_online(connect, friend_email) == 0)
     {
@@ -1024,7 +1024,7 @@ void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect)
         ret = sql_kick_anybody(connect, my_email.c_str(), email, group_name);
         if(ret == 0)
         {
-            send = "踢人失败, 数据库错误";
+            send = "踢人失败, 该用户不存在";
             sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
             return;
         }
@@ -1048,10 +1048,16 @@ void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect)
         ret = sql_kick_normal(connect, my_email.c_str(), email, group_name);
         if(ret == 0)
         {
-            send = "踢人失败, 数据库错误";
+            send = "踢人失败,  该用户不存在";
             sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
             return;
         }
+    }
+    else
+    {
+        send = "你不是群主或管理员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return; 
     }
 
     send = "踢" + std::string(email) + "成功";
@@ -1069,7 +1075,7 @@ void ServerhandleDisplayGroupMember(char* msg, int client_socket, MYSQL* connect
 
     std::string send;
 
-    int ret = sql_display_group_member(connect, my_email.c_str(), group_name, send);
+    int ret = sql_display_group_member_without_request(connect, my_email.c_str(), group_name, send);
 
     if(ret == 0)
     {
@@ -1107,7 +1113,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
     std::string time = dt;
     time.pop_back();
 
-    std::string send = sql_getname(connect, my_email.c_str()) + ": ("+ time + ")\n" + message + "\n";
+    std::string send = sql_getname(connect, my_email.c_str()) + ": ("+ time + ") from " + std::string(group_name) + "\n" + message + "\n";
 
     if(if_group_exist(connect, group_name) == 1)
     {
@@ -1129,6 +1135,8 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
     else if(ret == 2)
     {
         send = "你不是群成员";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
     }
 
     for (const auto& socket : hashTable)
@@ -1139,7 +1147,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
         }
     }
 
-    add_group_message_list(connect, my_email.c_str(), group_name, message, time.c_str());
+    add_group_message_list(connect, my_email.c_str(), group_name, message);
 }
 
 void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)

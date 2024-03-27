@@ -510,7 +510,7 @@ int sql_set_manager(MYSQL* connect, const char* my_email, const char* email, con
 {
     if(if_master(connect, my_email, group_name) == 0)
     {
-        std::cout << "您不是群主\n";
+        std::cout << "user is not master\n";
         return 0;
     }
 

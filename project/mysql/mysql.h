@@ -100,8 +100,8 @@ int sql_receive_file(MYSQL* connect, const char* email, const char* sender, cons
 //---------------------------------------------------------------------------------history
 int sql_friend_history(MYSQL* connect, const char* email, const char* friend_email, std::string& send);
 
-int add_friend_message_list(MYSQL* connect, const char* email, const char* friend_email, const char* message, const char* time);
+int add_friend_message_list(MYSQL* connect, const char* email, const char* friend_email, const char* message);
 
-int add_group_message_list(MYSQL* connect, const char* email, const char* group_name, const char* message, const char* time);
+int add_group_message_list(MYSQL* connect, const char* email, const char* group_name, const char* message);
 
 int sql_group_history(MYSQL* connect, const char* email, const char* group_name, std::string& send);

@@ -56,23 +56,26 @@ static void friend_menu(int sfd)
     std::cout << "3.屏蔽好友 4.解除屏蔽\n";
     std::cout << "5.好友列表 6.返回\n";
 
-    char command;
-    std::cin >> command;
-    clearInputBuffer();
-
-    switch (command)
+    while(true)
     {
-        case '1':     add_friend(sfd);                          break; 
-        case '2':     delete_friend(sfd);                       break;
-        case '3':     block_friend(sfd);                        break;
-        case '4':     unblock_friend(sfd);                      break;
-        case '5':     display_friend(sfd);                      break;
-        case '6':     std::cout << "退出好友操作界面\n";        return;
-        case 'h': 
-                      std::cout << "1.添加好友 2.删除好友\n";
-                      std::cout << "3.屏蔽好友 4.解除屏蔽\n";
-                      std::cout << "5.好友列表 6.返回\n";
-                      break;
+        char command;
+        std::cin >> command;
+        clearInputBuffer();
+
+        switch (command)
+        {
+            case '1':     add_friend(sfd);                          break; 
+            case '2':     delete_friend(sfd);                       break;
+            case '3':     block_friend(sfd);                        break;
+            case '4':     unblock_friend(sfd);                      break;
+            case '5':     display_friend(sfd);                      break;
+            case '6':     std::cout << "退出好友操作界面\n";        return;
+            case 'h': 
+                          std::cout << "1.添加好友 2.删除好友\n";
+                          std::cout << "3.屏蔽好友 4.解除屏蔽\n";
+                          std::cout << "5.好友列表 6.返回\n";
+                          break;
+        }
     }
 }
 
@@ -238,33 +241,36 @@ static void group_menu(int sfd)
     std::cout << "j.群聊成员    k.申请列表\n";
     std::cout << "l.拉人进群    m.退出\n";
 
-    char command;
-    std::cin >> command;
-    clearInputBuffer();
-
-    switch (command)
+    while(true)
     {
-        case 'a':    create_group(sfd);         break;
-        case 'b':    request_join_group(sfd);   break;
-        case 'c':    exit_group(sfd);           break;
-        case 'd':    delete_group(sfd);         break;
-        case 'e':    display_list_group(sfd);   break;
-        case 'f':    set_manager(sfd);          break;
-        case 'g':    cancel_manager(sfd);       break;
-        case 'i':    kick_somebody(sfd);        break;
-        case 'j':    display_group_member(sfd); break;
-        case 'k':    display_request_list(sfd); break;
-        case 'l':    add_people_in_group(sfd);  break;
-        case 'm':    std::cout << "退出群操作界面\n";         return;
-        case 'h': 
-                     std::cout << "群操作界面\n";
-                     std::cout << "a.创建群聊    b.加入群聊\n";
-                     std::cout << "c.退出群聊    d.解散群聊\n";
-                     std::cout << "e.群聊列表    f.设置管理员\n";
-                     std::cout << "g.删除管理员  i.踢人\n";
-                     std::cout << "j.群聊成员    k.申请列表\n";
-                     std::cout << "l.拉人进群    m.退出\n";
-                     break;
+        char command;
+        std::cin >> command;
+        clearInputBuffer();
+
+        switch (command)
+        {
+            case 'a':    create_group(sfd);         break;
+            case 'b':    request_join_group(sfd);   break;
+            case 'c':    exit_group(sfd);           break;
+            case 'd':    delete_group(sfd);         break;
+            case 'e':    display_list_group(sfd);   break;
+            case 'f':    set_manager(sfd);          break;
+            case 'g':    cancel_manager(sfd);       break;
+            case 'i':    kick_somebody(sfd);        break;
+            case 'j':    display_group_member(sfd); break;
+            case 'k':    display_request_list(sfd); break;
+            case 'l':    add_people_in_group(sfd);  break;
+            case 'm':    std::cout << "退出群操作界面\n";         return;
+            case 'h': 
+                         std::cout << "群操作界面\n";
+                         std::cout << "a.创建群聊    b.加入群聊\n";
+                         std::cout << "c.退出群聊    d.解散群聊\n";
+                         std::cout << "e.群聊列表    f.设置管理员\n";
+                         std::cout << "g.删除管理员  i.踢人\n";
+                         std::cout << "j.群聊成员    k.申请列表\n";
+                         std::cout << "l.拉人进群    m.退出\n";
+                         break;
+        }
     }
 }
 
@@ -374,17 +380,20 @@ void history_menu(int sfd)
     std::cin >> command;
     clearInputBuffer();
 
-    switch (command)
+    while(true)
     {
-        case '1':     firend_history(sfd);                      break; 
-        case '2':     group_history(sfd);                       break;
-        case '3':     std::cout << "退出历史记录界面\n";        return;
-        case 'h': 
-                      std::cout << "历史记录界面\n";
-                      std::cout << "1.好友历史记录\n";
-                      std::cout << "2.群历史记录\n";
-                      std::cout << "3.返回\n";
-                      break;
+        switch (command)
+        {
+            case '1':     firend_history(sfd);                      break; 
+            case '2':     group_history(sfd);                       break;
+            case '3':     std::cout << "退出历史记录界面\n";        return;
+            case 'h': 
+                          std::cout << "历史记录界面\n";
+                          std::cout << "1.好友历史记录\n";
+                          std::cout << "2.群历史记录\n";
+                          std::cout << "3.返回\n";
+                          break;
+        }
     }
 }
 

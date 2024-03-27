@@ -39,6 +39,8 @@ enum Type{
     SEND_FILE,
     RECEIVE_FILE,
     CHECK_FILE,
+    FRIEND_HISTORY,
+    GROUP_HISTORY,
 };
 
 int sendMsg(int cfd, const char* msg, int len, Type flag);
@@ -102,3 +104,7 @@ void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
 void ServerhandleCheckFile(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandleReceiveFile(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleFriendHistory(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleGroupHistory(char* msg, int client_socket, MYSQL* connect);

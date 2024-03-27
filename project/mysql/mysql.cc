@@ -43,6 +43,28 @@ MYSQL* sql_init(MYSQL* connect)
         std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
     }
 
+    // 创建好友消息历史记录
+    query = "CREATE TABLE IF NOT EXISTS friend_message_list (\
+            sender VARCHAR(255) NOT NULL,\
+            resver VARCHAR(255) NOT NULL,\
+            message TEXT NOT NULL,\
+            time DATETIME NOT NULL)";
+    if (mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+    }
+
+    // 创建群组消息历史记录
+    query = "CREATE TABLE IF NOT EXISTS group_message_list (\
+            group_name VARCHAR(255) NOT NULL,\
+            sender VARCHAR(255) NOT NULL,\
+            message TEXT NOT NULL,\
+            time DATETIME NOT NULL)";
+    if (mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+    }
+
     std::cout << "database ready\n";
 
     return connect;
@@ -887,5 +909,98 @@ int sql_receive_file(MYSQL* connect, const char* email, const char* sender, cons
     }
     */
 
+    return 1;
+}
+
+int sql_friend_history(MYSQL* connect, const char* email, const char* friend_email, std::string& send) {
+    if (!is_my_friend(connect, email, friend_email)) {
+        std::cerr << "Error: " << friend_email << " is not your friend\n";
+        return 2;
+    }
+
+    std::string query = "SELECT sender, message, time FROM friend_message_list WHERE (sender = '" + std::string(email) + "' AND resver = '" + std::string(friend_email) + "') OR (sender = '" + std::string(friend_email) + "' AND resver = '" + std::string(email) + "') ORDER BY time";
+        
+
+    if (mysql_query(connect, query.c_str())) {
+        std::cerr << "Error checking friend history: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr) {
+        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result))) {
+        send += std::string(row[0]) + " " + std::string(row[1]) + " " + std::string(row[2]) + '\n';
+    }
+
+    mysql_free_result(result);
+    return 1;
+}
+
+int add_friend_message_list(MYSQL* connect, const char* email, const char* friend_email, const char* message, const char* time)
+{
+    std::string query = "INSERT INTO friend_message_list(sender, resver, message, time) VALUES('" + std::string(email) + "', '" + std::string(friend_email) + "', '" + std::string(message) + "', NOW());";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error inserting friend history: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
+}
+
+int add_group_message_list(MYSQL* connect, const char* email, const char* group_name, const char* message, const char* time)
+{
+    std::string query = "INSERT INTO group_message_list(group_name, sender, message, time) VALUES('" + std::string(group_name) + "', '" + std::string(email) + "', '" + std::string(message) + "', NOW());";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        std::cerr << "Error inserting group history: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    return 1;
+}
+
+int sql_group_history(MYSQL* connect, const char* email, const char* group_name, std::string& send)
+{
+    if(if_group_exist( connect, group_name) == 1)
+    {
+        send = "该群聊不存在"; 
+        return 2;
+    }
+
+    if(if_member(connect, email, group_name) == 0)
+    {
+        send = "你不是该群组的成员";
+        return 3;
+    }
+
+    std::string query = "SELECT sender, message, time FROM group_message_list WHERE group_name = '" + std::string(group_name) + "' ORDER BY time";
+
+    std::cout << query << '\n';
+
+    if (mysql_query(connect, query.c_str())) {
+        std::cerr << "Error checking group history: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr) {
+        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        return 0;
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result))) {
+        send += std::string(row[0]) + " " + std::string(row[1]) + " " + std::string(row[2]) + '\n';
+    }
+
+    mysql_free_result(result);
     return 1;
 }

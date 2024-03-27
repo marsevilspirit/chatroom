@@ -678,16 +678,19 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
         return;
     }
 
-    if(sql_if_online(connect, friend_email) == 0)
+    if(sql_if_block(connect, email.c_str(), friend_email))
     {
-        send = "对方不在线";
+        send = "您已被对方屏蔽";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
-    if(sql_if_block(connect, email.c_str(), friend_email))
+
+    add_friend_message_list(connect, email.c_str(), friend_email, message,time.c_str());
+
+    if(sql_if_online(connect, friend_email) == 0)
     {
-        send = "您已被对方屏蔽";
+        send = "对方不在线";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
@@ -1115,7 +1118,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 
     std::string group_member;
 
-    int ret = sql_display_group_member(connect, my_email.c_str(), group_name, group_member);
+    int ret = sql_display_group_member_without_request(connect, my_email.c_str(), group_name, group_member);
 
     if(ret == 0)
     {
@@ -1135,6 +1138,8 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
             sendMsg(socket.first, send.c_str(), send.size(), GROUP_MESSAGE);
         }
     }
+
+    add_group_message_list(connect, my_email.c_str(), group_name, message, time.c_str());
 }
 
 void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
@@ -1235,5 +1240,42 @@ void ServerhandleReceiveFile(char* msg, int client_socket, MYSQL* connect)
     sendFile(client_socket, send.c_str(), to_file_path);
 
     send = "接收文件成功";
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleFriendHistory(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to check friend history: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    char* friend_email = msg;
+
+    std::string send;
+
+    if(sql_friend_history(connect, email.c_str(), friend_email, send) == 0)
+    {
+        send = "获取聊天记录失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleGroupHistory(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to check group history: " << client_socket << '\n';
+    std::cout << msg << '\n';
+
+    char* group_name = msg;
+
+    std::string send;
+
+    int ret = sql_group_history(connect, email.c_str(), group_name, send);
+
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }

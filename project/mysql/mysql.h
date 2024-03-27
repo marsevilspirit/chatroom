@@ -78,6 +78,8 @@ int sql_cancel_manager(MYSQL* connect, const char* my_email, const char* email, 
 
 int if_master(MYSQL* connect, const char* email, const char* group_name);
 
+int if_member(MYSQL* connect, const char* email, const char* group_name);
+
 int if_manager(MYSQL* connect, const char* email, const char* group_name);
 
 int sql_kick_anybody(MYSQL* connect, const char* my_email, const char* email, const char* group_name);
@@ -86,9 +88,20 @@ int sql_kick_normal(MYSQL* connect, const char* my_email, const char* email, con
 
 int sql_display_group_member(MYSQL* connect, const char* my_email, const char* group_name, std::string& send);
 
+int sql_display_group_member_without_request(MYSQL* connect, const char* my_email, const char* group_name, std::string& send);//1成功，2不存在, 0数据库错误
+
 //------------------------------------------------------------------------------file
 int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, const char* sender, const char* resver);
 
 int sql_check_file(MYSQL* connect, const char* email, std::string& send);
 
 int sql_receive_file(MYSQL* connect, const char* email, const char* sender, const char* file_name, std::string& send);
+
+//---------------------------------------------------------------------------------history
+int sql_friend_history(MYSQL* connect, const char* email, const char* friend_email, std::string& send);
+
+int add_friend_message_list(MYSQL* connect, const char* email, const char* friend_email, const char* message, const char* time);
+
+int add_group_message_list(MYSQL* connect, const char* email, const char* group_name, const char* message, const char* time);
+
+int sql_group_history(MYSQL* connect, const char* email, const char* group_name, std::string& send);

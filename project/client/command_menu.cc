@@ -99,7 +99,7 @@ static void private_chat(int sfd)
 
         if (sendMsg(sfd, final_msg.c_str(), final_msg.size(), PRIVATE_MESSAGE) == -1) 
         {
-            std::cout << "无效信息，发送失败\n";
+            std::cout << "无效信息，发送失败\n\n";
             continue;
         }
 
@@ -345,13 +345,57 @@ void check_file(int sfd)
     sendMsg(sfd, msg.c_str(), msg.size(), CHECK_FILE);
 }
 
+void firend_history(int sfd)
+{
+    std::string friend_email;
+    std::cout << "请输入好友的邮箱: ";
+    std::cin >> friend_email;
+
+    sendMsg(sfd, friend_email.c_str(), friend_email.size(), FRIEND_HISTORY);
+}
+
+void group_history(int sfd)
+{
+    std::string group_name;
+    std::cout << "请输入群聊名称：";
+    std::cin >> group_name;
+
+    sendMsg(sfd, group_name.c_str(), group_name.size(), GROUP_HISTORY);
+}
+
+void history_menu(int sfd)
+{
+    std::cout << "历史记录界面\n";
+    std::cout << "1.好友历史记录\n";
+    std::cout << "2.群历史记录\n";
+    std::cout << "3.返回\n";
+
+    char command;
+    std::cin >> command;
+    clearInputBuffer();
+
+    switch (command)
+    {
+        case '1':     firend_history(sfd);                      break; 
+        case '2':     group_history(sfd);                       break;
+        case '3':     std::cout << "退出历史记录界面\n";        return;
+        case 'h': 
+                      std::cout << "历史记录界面\n";
+                      std::cout << "1.好友历史记录\n";
+                      std::cout << "2.群历史记录\n";
+                      std::cout << "3.返回\n";
+                      break;
+    }
+}
+
 void commandMenu(int sfd)
 {
     std::cout << "command界面\n";
     std::cout << "1.私聊      2.群聊\n";
     std::cout << "3.发送文件  4.查看文件\n";
     std::cout << "5.好友操作  6.群操作\n";
-    std::cout << "7.接收文件  8.退出\n";
+    std::cout << "7.接收文件  8.历史记录\n";
+    std::cout << "9.退出\n";
 
     while(true)
     {
@@ -368,13 +412,15 @@ void commandMenu(int sfd)
             case '5':     friend_menu(sfd);                  break;
             case '6':     group_menu(sfd);                   break;
             case '7':     receive_file(sfd);                 break;
-            case '8':     std::cout << "退出command界面\n";  return;
+            case '8':     history_menu(sfd);                 break;
+            case '9':     std::cout << "退出command界面\n";  return;
             case 'h': 
                           std::cout << "command界面\n";
                           std::cout << "1.私聊      2.群聊\n";
                           std::cout << "3.发送文件  4.查看文件\n";
                           std::cout << "5.好友操作  6.群操作\n";
-                          std::cout << "7.接收文件 8.退出\n";
+                          std::cout << "7.接收文件  8.历史记录\n";
+                          std::cout << "9.退出\n";
                           break;
         }
     }

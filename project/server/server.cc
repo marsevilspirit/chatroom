@@ -155,6 +155,8 @@ void server::handleReceivedMessage(int client_socket)
             case SEND_FILE:             ServerhandleSendFile(msg, ret, client_socket, connect);          break;
             case CHECK_FILE:            ServerhandleCheckFile(msg, client_socket, connect);              break;
             case RECEIVE_FILE:          ServerhandleReceiveFile(msg, client_socket, connect);            break;
+            case FRIEND_HISTORY:        ServerhandleFriendHistory(msg, client_socket, connect);          break;
+            case GROUP_HISTORY:         ServerhandleGroupHistory(msg, client_socket, connect);           break;
             default:                    std::cerr << "Unknown message type\n";                           break;
         }
     }

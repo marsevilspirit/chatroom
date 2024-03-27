@@ -164,6 +164,38 @@ int if_master(MYSQL* connect, const char* email, const char* group_name)//0代�
     return 0;
 }
 
+int if_member(MYSQL* connect, const char* email, const char* group_name)//1有，0没有
+{
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "SELECT 1 FROM " + emailStr + "_group WHERE group_name = '" + std::string(group_name) + "' AND status != 'request' LIMIT 1;";
+
+    if(mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if(result && mysql_num_rows(result) > 0)
+    {
+        mysql_free_result(result);
+        return 1;
+    }
+    mysql_free_result(result);
+
+    return 0;
+}
+
 int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)//1成功，2不存在，3不是群主
 {
     //替换@符号
@@ -795,6 +827,62 @@ int sql_display_group_member(MYSQL* connect, const char* my_email, const char* g
     }
 
     query = "SELECT * FROM " + std::string(group_name) + "_group;";
+
+    if(mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        return 0;
+    }
+
+    result = mysql_store_result(connect);
+    MYSQL_ROW row;
+
+    while((row = mysql_fetch_row(result)))
+    {
+        send += std::string(row[0]) + ' ' + std::string(row[1]) + '\n';
+    }
+
+    mysql_free_result(result);
+
+    return 1;
+}
+
+int sql_display_group_member_without_request(MYSQL* connect, const char* my_email, const char* group_name, std::string& send)//1成功，2不存在, 0数据库错误
+{
+    //替换@符号
+    std::string my_emailStr = std::string(my_email);
+    std::replace(my_emailStr.begin(), my_emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = my_emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        my_emailStr = my_emailStr.substr(0, pos);
+    }
+
+    //检查是否为群成员
+    std::string query = "SELECT 1 FROM " + my_emailStr + "_group WHERE group_name = '" + std::string(group_name) + "' AND status != 'request' LIMIT 1;";
+
+    if(mysql_query(connect, query.c_str()))
+    {
+        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+
+    if(result && mysql_num_rows(result) > 0)
+    {
+        mysql_free_result(result);
+    }
+    else
+    {
+        std::cerr << "You are not a member of this group." << std::endl;
+        mysql_free_result(result);
+        return 2;
+    }
+
+    query = "SELECT * FROM " + std::string(group_name) + "_group WHERE status != 'request';";
 
     if(mysql_query(connect, query.c_str()))
     {

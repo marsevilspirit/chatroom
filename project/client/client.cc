@@ -46,7 +46,7 @@ void sendMessageThread(int sfd)
 
         if (sendMsg(sfd, msg.c_str(), msg.size(), WORLD_MESSAGE) == -1) 
         {
-            std::cout << "无效信息，发送失败\n";
+            std::cout << "无效信息，发送失败\n\n";
             continue;
         }
 

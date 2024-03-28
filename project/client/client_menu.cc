@@ -153,8 +153,7 @@ static void ClienthandleRegister(int sfd)
     std::string name;
     std::cin >> name;
 
-    std::string msg = email + " " + hashedPasswd + " " + name;
-
+    std::string msg = "{\"email\": \"" + email + "\", \"passwd\": \"" + hashedPasswd + "\", \"name\": \"" + name + "\"}";
 
     sendMsg(sfd, msg.c_str(), msg.size(), REGISTER);
 
@@ -237,7 +236,8 @@ static int ClienthandleLogin(int sfd)
     hexHash[hashLen * 2] = '\0';
     hashedPasswd = hexHash;
 
-    std::string msg = email + ' ' + hashedPasswd;
+
+    std::string msg = "{\"email\": \"" + email + "\", \"passwd\": \"" + hashedPasswd + "\"}";
 
     sendMsg(sfd, msg.c_str(), msg.size(), LOGIN);
 
@@ -328,6 +328,50 @@ static void ClienthandleForgetPasswd(int sfd)
 
     std::cout << '\n'; // 输出换行
 
+            // 使用SHA-256哈希函数对密码进行加密
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    if (!ctx)
+    {
+        std::cerr << "创建EVP_MD_CTX失败\n";
+        return;
+    }
+
+    if (!EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr))
+    {
+        std::cerr << "初始化哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    if (!EVP_DigestUpdate(ctx, passwd.c_str(), passwd.size()))
+    {
+        std::cerr << "更新哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hashLen;
+    if (!EVP_DigestFinal_ex(ctx, hash, &hashLen))
+    {
+        std::cerr << "完成哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    EVP_MD_CTX_free(ctx);
+
+    // 将哈希值转换为十六进制字符串
+    std::string hashedPasswd;
+    char hexHash[hashLen * 2 + 1];
+    for (unsigned int i = 0; i < hashLen; i++)
+    {
+        sprintf(hexHash + (i * 2), "%02x", hash[i]);
+    }
+    hexHash[hashLen * 2] = '\0';
+    hashedPasswd = hexHash;
+
+
     // 检查密码和确认密码是否一致
     if (passwd != confirmPasswd)
     {
@@ -335,7 +379,7 @@ static void ClienthandleForgetPasswd(int sfd)
         return;
     }
 
-    std::string msg = email + ' ' + passwd; 
+    std::string msg = "{\"email\": \"" + email + "\", \"passwd\": \"" + hashedPasswd + "\"}";
 
     sendMsg(sfd, msg.c_str(), msg.size(), FORGET_PASSWD); 
 
@@ -374,6 +418,50 @@ void ClienthandleDeleteAccount(int sfd)
 
     std::cout << '\n'; // 输出换行
 
+            // 使用SHA-256哈希函数对密码进行加密
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    if (!ctx)
+    {
+        std::cerr << "创建EVP_MD_CTX失败\n";
+        return;
+    }
+
+    if (!EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr))
+    {
+        std::cerr << "初始化哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    if (!EVP_DigestUpdate(ctx, passwd.c_str(), passwd.size()))
+    {
+        std::cerr << "更新哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hashLen;
+    if (!EVP_DigestFinal_ex(ctx, hash, &hashLen))
+    {
+        std::cerr << "完成哈希函数失败\n";
+        EVP_MD_CTX_free(ctx);
+        return;
+    }
+
+    EVP_MD_CTX_free(ctx);
+
+    // 将哈希值转换为十六进制字符串
+    std::string hashedPasswd;
+    char hexHash[hashLen * 2 + 1];
+    for (unsigned int i = 0; i < hashLen; i++)
+    {
+        sprintf(hexHash + (i * 2), "%02x", hash[i]);
+    }
+    hexHash[hashLen * 2] = '\0';
+    hashedPasswd = hexHash;
+
+
     std::string choice;
     std::cout << "你确定要删除账号吗？(y/n): ";
     std::cin >> choice;
@@ -383,7 +471,7 @@ void ClienthandleDeleteAccount(int sfd)
         return;
     }
 
-    std::string msg = email + ' ' + passwd;
+    std::string msg = "{\"email\": \"" + email + "\", \"passwd\": \"" + hashedPasswd + "\"}";
     
     sendMsg(sfd, msg.c_str(), msg.size(), DELETE_ACCOUNT);
 

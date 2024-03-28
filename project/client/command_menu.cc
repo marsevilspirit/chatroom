@@ -178,7 +178,9 @@ static void set_manager(int sfd)
     std::cout << "请输入要设置为管理员的邮箱: ";
     std::cin >> email;
 
-    std::string send = group_name + " " + email;
+
+    std::string send = "{\"group_name\": \"" + group_name + "\", \"email\": \"" + email+ "\"}";
+
     sendMsg(sfd, send.c_str(), send.size(), SET_MANAGER);
 }
 
@@ -191,7 +193,8 @@ static void add_people_in_group(int sfd)
     std::cout << "请输入要拉进群的邮箱: ";
     std::cin >> email;
 
-    std::string send = group_name + " " + email;
+    std::string send = "{\"group_name\": \"" + group_name + "\", \"email\": \"" + email+ "\"}";
+
     sendMsg(sfd, send.c_str(), send.size(), ADD_GROUP);
 }
 
@@ -204,7 +207,8 @@ static void cancel_manager(int sfd)
     std::cout << "请输入要取消管理员的邮箱: ";
     std::cin >> email;
 
-    std::string send = group_name + " " + email;
+    std::string send = "{\"group_name\": \"" + group_name + "\", \"email\": \"" + email+ "\"}"; 
+
     sendMsg(sfd, send.c_str(), send.size(), CANCEL_MANAGER);
 }
 
@@ -217,7 +221,8 @@ static void kick_somebody(int sfd)
     std::cout << "请输入要踢出群聊的邮箱: ";
     std::cin >> email;
 
-    std::string send = group_name + " " + email;
+    std::string send = "{\"group_name\": \"" + group_name + "\", \"email\": \"" + email+ "\"}";
+
     sendMsg(sfd, send.c_str(), send.size(), KICK_SOMEBODY);
 }
 
@@ -291,7 +296,7 @@ void group_chat(int sfd)
 
         std::cout << "msg: " << msg << '\n';
 
-        std::string final_msg = group_name + " " + msg;
+        std::string final_msg = "{\"group_name\": \"" + group_name + "\", \"msg\": \"" + msg + "\" }";
 
         usleep(1000); // 暂停一毫秒
 

@@ -17,6 +17,7 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 #include "../message/message.h"
+#include "../json.hpp"
 
 void enterChatroom(int sfd);
 

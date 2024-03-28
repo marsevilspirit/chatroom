@@ -5,6 +5,7 @@ add_library(message
     ../mysql/mysql.cc 
     ../mysql/mysql.h
     ../mysql/mysql_group.cc
+    ../json.hpp
 )
 
 # 设置头文件路径（如果有头文件的话）

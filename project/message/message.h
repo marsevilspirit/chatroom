@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include "../mysql/mysql.h"
+#include "../json.hpp"
 
 enum Type{
     LOGIN = 1,

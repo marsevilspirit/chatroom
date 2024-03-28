@@ -70,7 +70,7 @@ MYSQL* sql_init(MYSQL* connect)
     return connect;
 }
 
-int sql_insert(MYSQL* connect, char* email, char* password, char* name)
+int sql_insert(MYSQL* connect, const char* email, const char* password, const char* name)
 {
     // 构造插入 SQL 语句
     std::string sql_query = "INSERT INTO accounts (email, password, name) VALUES ('" +
@@ -91,6 +91,8 @@ int sql_select(MYSQL* connect, const char* email, const char* password)
 {
     // 构建 SQL 查询语句
     std::string query = "SELECT 1 FROM accounts WHERE email='" + std::string(email) + "' AND password='" + std::string(password) + "' LIMIT 1";
+
+    std::cout << query << '\n';
 
     // 执行 SQL 查询
     if (mysql_query(connect, query.c_str())) 
@@ -204,7 +206,9 @@ int update_online_status(MYSQL* connect, const char* email, int status)
 
 int update_passwd(MYSQL* connect, const char* email, const char* password)
 {
-    std::string query = "UPDATE accounts SET password = " + std::string(password) + " WHERE email = '" + std::string(email) + "'";
+    std::string query = "UPDATE accounts SET password = '" + std::string(password) + "' WHERE email = '" + std::string(email) + "'";
+
+    std::cout << query << '\n';
 
     if(mysql_query(connect, query.c_str()))
     {

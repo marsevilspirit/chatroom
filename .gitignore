@@ -5,4 +5,3 @@ Makefile
 CMakeCache.txt
 CMakeFiles/
 *.cmake 
-*.cmake 

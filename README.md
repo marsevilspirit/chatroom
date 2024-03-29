@@ -14,6 +14,20 @@ C++书写，通过Cmake管理多文件编译。
 
 代码量5000行左右。
 
+## 依赖
+
+libesmtp-devel 用于发邮件
+
+mysql-connector-c mysql的cAPI接口
+
+openssl 邮件依赖
+
+arch linux配置环境
+
+```
+yay libesmtp-devel mysql-connector-c openssl
+```
+
 ## 功能
 
 ### 登录界面

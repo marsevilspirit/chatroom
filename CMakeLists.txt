@@ -19,6 +19,7 @@ add_executable(client
     project/client/client_menu.cc
     project/client/mail.cc
     project/client/command_menu.cc
+    project/threadpool/threadpool.cc
 )
 
 target_link_libraries(chatroom server)

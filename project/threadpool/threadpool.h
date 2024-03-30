@@ -4,7 +4,7 @@
 #include <queue>
 #include <condition_variable>
 
-#define THREAD_NUM 20
+#define THREAD_NUM 5
 
 class threadpool{
 public:

@@ -175,14 +175,14 @@ int sql_if_online(MYSQL* connect, const char* email)
 
     if (mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+        std::cerr << "Error querying database(sql_if_online): " << mysql_error(connect) << '\n';
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr)
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        std::cerr << "Error storing result(sql_if_online): " << mysql_error(connect) << '\n';
         return 0;
     }
 
@@ -245,13 +245,13 @@ std::string sql_getname(MYSQL* connect, const char* email)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+        std::cerr << "Error querying database(sql_getname): " << mysql_error(connect) << '\n';
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if(result == nullptr)
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        std::cerr << "Error storing result(sql_getname): " << mysql_error(connect) << '\n';
     }
 
     MYSQL_ROW row = mysql_fetch_row(result);

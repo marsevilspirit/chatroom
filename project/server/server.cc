@@ -200,7 +200,8 @@ void server::run()
                   
                 std::cout << "client on line client_socket: " << client_socket << '\n';
                 client_sockets.push_back(client_socket);
-                threadPool.enqueue(&server::handleClientConnect, this, client_socket);//---------------to do
+                //threadPool.enqueue(&server::handleClientConnect, this, client_socket);//---------------to do
+                server::handleClientConnect(client_socket);
             }
             else//不是server_socket有事
             {
@@ -221,7 +222,8 @@ void server::run()
                 else if(events[i].events & EPOLLIN)//接收信息
                 {
                     int fd = events[i].data.fd;
-                    threadPool.enqueue(&server::handleReceivedMessage, this, fd);
+                    //threadPool.enqueue(&server::handleReceivedMessage, this, fd);
+                    server::handleReceivedMessage(fd);
                 }
                 else if(events[i].events & EPOLLOUT)//发送信息
                 {

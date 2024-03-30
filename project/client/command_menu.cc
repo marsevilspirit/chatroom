@@ -381,12 +381,12 @@ void history_menu(int sfd)
     std::cout << "2.群历史记录\n";
     std::cout << "3.返回\n";
 
-    char command;
-    std::cin >> command;
-    clearInputBuffer();
-
     while(true)
     {
+        char command;
+        std::cin >> command;
+        clearInputBuffer();
+
         switch (command)
         {
             case '1':     firend_history(sfd);                      break; 

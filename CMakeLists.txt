@@ -1,15 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
+
 project(chatroom)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# 添加子目录
 add_subdirectory(project/server)
 add_subdirectory(project/threadpool)
 add_subdirectory(project/message)
 
-# 主项目构建
 add_executable(chatroom 
     project/main.cc
 )

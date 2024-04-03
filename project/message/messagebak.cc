@@ -256,6 +256,7 @@ int sendFile(int cfd, const char* file_path)
 // 接收文件函数
 int recvFile(int cfd, char* buffer, int ret, const char* file_path)
 {
+
     FILE* file = fopen(file_path, "wb");
     if (!file)
     {
@@ -1135,7 +1136,7 @@ void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
 
     size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
 
-    std::string savePath = "./server_file/" + sender + "_" + std::string(file_name);
+    std::string savePath = "./sever_file/" + sender + "_" + std::string(file_name);
 
     int ret = sql_file_list(connect, file_name, savePath.c_str(), sender.c_str(), resver);
 

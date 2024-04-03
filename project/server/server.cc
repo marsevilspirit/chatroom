@@ -1,5 +1,5 @@
 #include "server.h"
-#include "../threadpool/threadpool.h"
+//#include "../threadpool/threadpool.h"
 #include "../message/message.h"
 
 extern std::unordered_map<int, std::string> hashTable;
@@ -45,7 +45,7 @@ static void setFdNoblock(int fd)
     fcntl(fd, F_SETFL, fcntl(fd, F_SETFL) | O_NONBLOCK);
 }
 
-server::server(int port)
+server::server(int port): threadPool(THREAD_NUM)
 {
     epoll_fd = epoll_create1(0);
     if(epoll_fd == -1)
@@ -129,35 +129,35 @@ void server::handleReceivedMessage(int client_socket)
     {
         switch (flag)
         {
-            case WORLD_MESSAGE:         handleWorldMessage(connect, msg, client_socket, client_sockets); break;
-            case REGISTER:              ServerhandleRegister(msg, client_socket, connect);               break;
-            case LOGIN:                 ServerhandleLogin(msg, client_socket, connect);                  break;
-            case FORGET_PASSWD:         ServerhandleForgetPasswd(msg, client_socket, connect);           break;
-            case DELETE_ACCOUNT:        ServerhandleDeleteAccount(msg, client_socket, connect);          break;
-            case ADD_FRIEND:            ServerhandleAddFriend(msg, client_socket, connect);              break;
-            case DELETE_FRIEND:         ServerhandleDeleteFriend(msg, client_socket, connect);           break;
-            case BLOCK_FRIEND:          ServerhandleBlockFriend(msg, client_socket, connect);            break;
-            case UNBLOCK_FRIEND:        ServerhandleUnblockFriend(msg, client_socket, connect);          break;
-            case DISPLAY_FRIEND:        ServerhandleDisplayFriend(msg, client_socket, connect);          break;
-            case PRIVATE_MESSAGE:       ServerhandlePrivateMessage(msg, client_socket, connect);         break;
-            case CREATE_GROUP:          ServerhandleCreateGroup(msg, client_socket, connect);            break;
-            case DELETE_GROUP:          ServerhandleDeleteGroup(msg, client_socket, connect);            break;
-            case JOIN_GROUP:            ServerhandleRequestJoinGroup(msg, client_socket, connect);       break;
-            case EXIT_GROUP:            ServerhandleExitGroup(msg, client_socket, connect);              break;
-            case DISPLAY_GROUP:         ServerhandleDisplayGroupList(client_socket, connect);            break;
-            case DISPLAY_GROUP_REQUEST: ServerhandleDisplayRequestList(msg, client_socket, connect);     break;
-            case SET_MANAGER:           ServerhandleSetManager(msg, client_socket, connect);             break;
-            case ADD_GROUP:             ServerhandleAddGroup(msg, client_socket, connect);               break;
-            case CANCEL_MANAGER:        ServerhandleCancelManager(msg, client_socket, connect);          break;
-            case KICK_SOMEBODY:         ServerhandleKickSomebody(msg, client_socket, connect);           break;
-            case DISPLAY_GROUP_MEMBER:  ServerhandleDisplayGroupMember(msg, client_socket, connect);     break;
-            case GROUP_MESSAGE:         ServerhandleGroupMessage(msg, client_socket, connect);           break;
-            case SEND_FILE:             ServerhandleSendFile(msg, ret, client_socket, connect);          break;
-            case CHECK_FILE:            ServerhandleCheckFile(msg, client_socket, connect);              break;
-            case RECEIVE_FILE:          ServerhandleReceiveFile(msg, client_socket, connect);            break;
-            case FRIEND_HISTORY:        ServerhandleFriendHistory(msg, client_socket, connect);          break;
-            case GROUP_HISTORY:         ServerhandleGroupHistory(msg, client_socket, connect);           break;
-            default:                    std::cerr << "Unknown message type\n";                           break;
+            case WORLD_MESSAGE:         handleWorldMessage(connect, msg, client_socket, client_sockets);                     break;
+            case REGISTER:              threadPool.enqueue(ServerhandleRegister, msg, client_socket, connect);               break;
+            case LOGIN:                 ServerhandleLogin(msg, client_socket, connect);                                      break;
+            case FORGET_PASSWD:         threadPool.enqueue(ServerhandleForgetPasswd, msg, client_socket, connect);           break;
+            case DELETE_ACCOUNT:        threadPool.enqueue(ServerhandleDeleteAccount, msg, client_socket, connect);          break;
+            case ADD_FRIEND:            threadPool.enqueue(ServerhandleAddFriend, msg, client_socket, connect);              break;
+            case DELETE_FRIEND:         threadPool.enqueue(ServerhandleDeleteFriend, msg, client_socket, connect);           break;
+            case BLOCK_FRIEND:          threadPool.enqueue(ServerhandleBlockFriend, msg, client_socket, connect);            break;
+            case UNBLOCK_FRIEND:        threadPool.enqueue(ServerhandleUnblockFriend, msg, client_socket, connect);          break;
+            case DISPLAY_FRIEND:        threadPool.enqueue(ServerhandleDisplayFriend, msg, client_socket, connect);          break;
+            case PRIVATE_MESSAGE:       ServerhandlePrivateMessage(msg, client_socket, connect);                             break;
+            case CREATE_GROUP:          threadPool.enqueue(ServerhandleCreateGroup, msg, client_socket, connect);            break;
+            case DELETE_GROUP:          threadPool.enqueue(ServerhandleDeleteGroup, msg, client_socket, connect);            break;
+            case JOIN_GROUP:            threadPool.enqueue(ServerhandleRequestJoinGroup, msg, client_socket, connect);       break;
+            case EXIT_GROUP:            threadPool.enqueue(ServerhandleExitGroup, msg, client_socket, connect);              break;
+            case DISPLAY_GROUP:         threadPool.enqueue(ServerhandleDisplayGroupList, client_socket, connect);            break;
+            case DISPLAY_GROUP_REQUEST: threadPool.enqueue(ServerhandleDisplayRequestList, msg, client_socket, connect);     break;
+            case SET_MANAGER:           threadPool.enqueue(ServerhandleSetManager, msg, client_socket, connect);             break;
+            case ADD_GROUP:             threadPool.enqueue(ServerhandleAddGroup, msg, client_socket, connect);               break;
+            case CANCEL_MANAGER:        threadPool.enqueue(ServerhandleCancelManager, msg, client_socket, connect);          break;
+            case KICK_SOMEBODY:         threadPool.enqueue(ServerhandleKickSomebody, msg, client_socket, connect);           break;
+            case DISPLAY_GROUP_MEMBER:  threadPool.enqueue(ServerhandleDisplayGroupMember, msg, client_socket, connect);     break;
+            case GROUP_MESSAGE:         ServerhandleGroupMessage(msg, client_socket, connect);                               break;
+            case SEND_FILE:             threadPool.enqueue(ServerhandleSendFile, msg, ret, client_socket, connect);          break;
+            case CHECK_FILE:            threadPool.enqueue(ServerhandleCheckFile, msg, client_socket, connect);              break;
+            case RECEIVE_FILE:          threadPool.enqueue(ServerhandleReceiveFile, msg, client_socket, connect);            break;
+            case FRIEND_HISTORY:        threadPool.enqueue(ServerhandleFriendHistory, msg, client_socket, connect);          break;
+            case GROUP_HISTORY:         threadPool.enqueue(ServerhandleGroupHistory, msg, client_socket, connect);           break;
+            default:                    std::cerr << "Unknown message type\n";                                               break;
         }
     }
 }
@@ -170,8 +170,6 @@ void server::run()
 
     if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_socket, &event) == -1)
         throw std::runtime_error("Error in epoll_ctl");
-
-    threadpool threadPool(THREAD_NUM);
 
     epoll_event events[MAX_EVENTS];
 

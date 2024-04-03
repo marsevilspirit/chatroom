@@ -9,6 +9,7 @@
 #include <ifaddrs.h>
 #include <netinet/in.h>
 #include "../mysql/mysql.h"
+#include "../threadpool/threadpool.h"
 
 #define MAX_EVENTS 1024
 
@@ -28,4 +29,5 @@ private:
     int server_socket;
     std::vector<int> client_sockets;
     MYSQL* connect{};
+    threadpool threadPool;
 };

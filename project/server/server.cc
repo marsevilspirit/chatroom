@@ -153,6 +153,7 @@ void server::handleReceivedMessage(int client_socket)
             case DISPLAY_GROUP_MEMBER:  threadPool.enqueue(ServerhandleDisplayGroupMember, msg, client_socket, connect);     break;
             case GROUP_MESSAGE:         ServerhandleGroupMessage(msg, client_socket, connect);                               break;
             case SEND_FILE:             threadPool.enqueue(ServerhandleSendFile, msg, ret, client_socket, connect);          break;
+            case SEND_FILE_LONG:        threadPool.enqueue(ServerhandleSendFile_long, msg, ret, client_socket, connect);     break;
             case CHECK_FILE:            threadPool.enqueue(ServerhandleCheckFile, msg, client_socket, connect);              break;
             case RECEIVE_FILE:          threadPool.enqueue(ServerhandleReceiveFile, msg, client_socket, connect);            break;
             case FRIEND_HISTORY:        threadPool.enqueue(ServerhandleFriendHistory, msg, client_socket, connect);          break;

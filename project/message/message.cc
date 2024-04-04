@@ -143,7 +143,16 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     fseek(file, 0, SEEK_SET);
 
     // 计算消息总大小
-    size_t msgSize = strlen(file_name) + strlen(resver) + fileSize + 2; // 加上空格的大小
+    size_t msgSize;
+    const size_t block_size = 1024;
+
+    std::cout << "fileSize: " << fileSize << '\n';
+
+    if(fileSize <= block_size)
+        msgSize = strlen(file_name) + strlen(resver) + fileSize + 2; // 加上空格的大小
+    else
+        msgSize = strlen(file_name) + strlen(resver) + block_size + 2; // 加上空格的大小
+
     char* buffer = (char*)malloc(msgSize);
     if (!buffer)
     {
@@ -164,12 +173,55 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     ptr++;
 
     // 读取文件内容并写入 buffer
-    fread(ptr, 1, fileSize, file);
-    fclose(file);
+    if(fileSize < block_size)
+        fread(ptr, 1, fileSize, file);
+    else
+        fread(ptr, 1, block_size, file);
+    
+    fileSize -= block_size;
 
     // 发送消息
     int ret = sendMsg(cfd, buffer, msgSize, SEND_FILE);
 
+    if(fileSize <= block_size)
+    {
+        fclose(file);
+        free(buffer);
+        return ret;
+    }
+
+    while(fileSize > 0)
+    {
+        usleep(10000);
+
+        memset(buffer, 0, msgSize);
+
+        char* ptr = buffer;
+        strcpy(ptr, file_name);
+        ptr += strlen(file_name);
+        *ptr = ' ';
+        ptr++;
+        strcpy(ptr, resver);
+        ptr += strlen(resver);
+        *ptr = ' ';
+        ptr++;
+
+        if(fileSize < block_size)
+            fread(ptr, 1, fileSize, file);
+        else
+            fread(ptr, 1, block_size, file);
+
+        if(fileSize > block_size)
+            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
+        else
+            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 2, SEND_FILE_LONG);
+        
+        fileSize -= block_size;
+
+        std::cout << "(while)fileSize: " << fileSize << '\n';
+    }
+
+    fclose(file);
     free(buffer);
 
     return ret;
@@ -190,7 +242,14 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
     fseek(file, 0, SEEK_SET);
 
     // 计算消息总大小
-    size_t msgSize = strlen(to_file_path) + fileSize + 1; // 加上空格的大小
+    size_t msgSize;
+    const size_t block_size = 1024;
+
+    if(fileSize <= block_size)
+        msgSize = strlen(to_file_path) + fileSize + 1; // 加上空格的大小
+    else
+        msgSize = strlen(to_file_path) + block_size + 1; // 加上空格的大小
+
     char* buffer = (char*)malloc(msgSize);
     if (!buffer)
     {
@@ -198,6 +257,8 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
         fclose(file);
         return -1;
     }
+
+    std::cout << "msgSize: " << msgSize << '\n';
 
     // 将文件名、文件路径和接收方用户名写入 buffer，中间用空格分隔
     char* ptr = buffer;
@@ -207,12 +268,54 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
     ptr++;
 
     // 读取文件内容并写入 buffer
-    fread(ptr, 1, fileSize, file);
-    fclose(file);
+    if(fileSize <= block_size)
+        fread(ptr, 1, fileSize, file);
+    else
+        fread(ptr, 1, block_size, file);
 
-    // 发送消息
     int ret = sendMsg(cfd, buffer, msgSize, SEND_FILE);
 
+    fileSize -= block_size;
+
+    std::cout << "fileSize: " << fileSize << '\n';
+
+    if(fileSize <= block_size)
+    {
+        fclose(file);
+        free(buffer);
+        return ret;
+    }
+
+    while(fileSize > 0)
+    {
+        usleep(10000);
+
+        memset(buffer, 0, msgSize);
+
+        char* ptr = buffer;
+        strcpy(ptr, to_file_path);
+        ptr += strlen(to_file_path);
+        *ptr = ' ';
+        ptr++;
+
+        if(fileSize < block_size)
+            fread(ptr, 1, fileSize, file);
+        else
+            fread(ptr, 1, block_size, file);
+
+        if(fileSize > block_size)
+            ret = sendMsg(cfd, buffer, strlen(to_file_path) + block_size + 1, SEND_FILE_LONG);
+        else
+            ret = sendMsg(cfd, buffer, strlen(to_file_path) + fileSize + 1, SEND_FILE_LONG);
+
+        std::cout << "buffer: " << buffer << '\n';
+        
+        fileSize -= block_size;
+
+        std::cout << "(while)fileSize: " << fileSize << '\n';
+    }
+
+    fclose(file);
     free(buffer);
 
     return ret;
@@ -270,6 +373,25 @@ int recvFile(int cfd, char* buffer, int ret, const char* file_path)
     return 0;
 }
 
+// 接收文件函数
+int recvFile_long(int cfd, char* buffer, int ret, const char* file_path)
+{
+    FILE* file = fopen(file_path, "ab");
+    if (!file)
+    {
+        perror("fopen");
+        free(buffer);
+        return -1;
+    }
+
+    std::cout << buffer << '\n';
+
+    fwrite(buffer, 1, ret, file);
+
+    fclose(file);
+    return 0;
+}
+
 void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets)
 {
     std::cout << "Received message from client: " << hashTable[client_socket] << '\n';
@@ -291,7 +413,7 @@ void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vecto
 void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
 {
     std::cout << "New user want to register: " << client_socket << '\n';
-    
+
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string email = j["email"];
     std::string password = j["passwd"];
@@ -412,7 +534,7 @@ void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
 
     send = "密码更新成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
-    
+
 }
 
 void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
@@ -1150,6 +1272,49 @@ void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
 
 }
 
+void ServerhandleSendFile_long(char* msg, int len, int client_socket, MYSQL* connect)
+{
+    std::string sender = hashTable[client_socket];
+
+    std::cout << "user want to send file_long: " << client_socket << '\n'; 
+
+    char* file_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+
+    char* resver = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+    msg++;
+
+    std::cout << "file_name: " << file_name << '\n';
+    std::cout << "resver: " << resver << '\n';
+
+
+    size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
+
+    std::string savePath = "./server_file/" + sender + "_" + std::string(file_name);
+
+    int ret = sql_file_list(connect, file_name, savePath.c_str(), sender.c_str(), resver);
+
+    if(ret == 0)
+    {
+        std::string send = "发送文件失败，确定对方是你的朋友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    recvFile_long(client_socket, msg, msgSize, savePath.c_str());
+}
+
+
 void ServerhandleCheckFile(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
@@ -1207,6 +1372,7 @@ void ServerhandleReceiveFile(char* msg, int client_socket, MYSQL* connect)
     send = "接收文件成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }
+
 
 void ServerhandleFriendHistory(char* msg, int client_socket, MYSQL* connect)
 {

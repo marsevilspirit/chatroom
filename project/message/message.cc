@@ -144,7 +144,7 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
 
     // 计算消息总大小
     size_t msgSize;
-    const size_t block_size = 1024;
+    const size_t block_size = 409600;
 
     std::cout << "fileSize: " << fileSize << '\n';
 
@@ -192,7 +192,7 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
 
     while(fileSize > 0)
     {
-        usleep(10000);
+        usleep(20000);
 
         memset(buffer, 0, msgSize);
 
@@ -243,7 +243,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
 
     // 计算消息总大小
     size_t msgSize;
-    const size_t block_size = 1024;
+    const size_t block_size = 409600;
 
     if(fileSize <= block_size)
         msgSize = strlen(to_file_path) + fileSize + 1; // 加上空格的大小
@@ -288,7 +288,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
 
     while(fileSize > 0)
     {
-        usleep(10000);
+        usleep(20000);
 
         memset(buffer, 0, msgSize);
 

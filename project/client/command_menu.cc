@@ -90,11 +90,14 @@ static void private_chat(int sfd)
 
     clearInputBuffer();
 
-    while (msg != "exit")
+    while (true)
     {
         std::getline(std::cin, msg); // 读取整行输入
 
-        std::cout << "msg: " << msg << '\n';
+        if(msg == "exit")
+        {
+            break;
+        }
 
         std::string final_msg = friend_email + " " + msg;
 
@@ -290,11 +293,14 @@ void group_chat(int sfd)
 
     clearInputBuffer();
 
-    while (msg != "exit")
+    while (true)
     {
         std::getline(std::cin, msg); // 读取整行输入
 
-        std::cout << "msg: " << msg << '\n';
+        if(msg == "exit")
+        {
+            break;
+        }
 
         std::string final_msg = "{\"group_name\": \"" + group_name + "\", \"msg\": \"" + msg + "\" }";
 

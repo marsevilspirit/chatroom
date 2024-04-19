@@ -57,6 +57,8 @@ void resvFile(const char* msg, const char* file_path);
 
 int recvFile_long(int cfd, char* buffer, int ret, const char* file_path);
 
+void handleOffline(MYSQL* connect, int client_socket);
+
 void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets);
 
 void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect);

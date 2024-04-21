@@ -19,6 +19,8 @@ static int writen(int fd, const char* msg, int size)
     int count = size;
     while(count > 0)
     {
+        usleep(10000);
+
         int len = send(fd, buf, count, 0);
         if(len == -1)
         {
@@ -81,7 +83,10 @@ static int readn(int fd, char* buf, int size)
 
     while (count > 0)
     {
+        usleep(10000);
+
         int len = recv(fd, pt, count, 0);
+
         if (len == -1)
             return -1;
         else if (len == 0)
@@ -99,6 +104,7 @@ int recvMsg(int cfd, char** msg, Type* flag)
     int len = 0;
     if (readn(cfd, (char*)&len, 4) == -1) 
     {
+        std::cout << "len: " << len << '\n';
         return -1;
     }
 
@@ -131,31 +137,31 @@ int recvMsg(int cfd, char** msg, Type* flag)
 // 发送文件函数
 int sendFile(int cfd, const char* file_name, const char* file_path, const char* resver)
 {
-    std::ifstream file(file_path, std::ios::binary | std::ios::ate);
-    if (!file.is_open())
+    FILE* file = fopen(file_path, "rb");
+    if (!file)
     {
-        perror("ifstream");
+        perror("fopen");
         return -1;
     }
 
-    std::streamsize fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
 
     // 计算消息总大小
+    size_t msgSize;
     const size_t block_size = 409600;
 
-    std::streamsize remaining = fileSize;
-    size_t msgSize;
-    if (remaining <= block_size)
-        msgSize = strlen(file_name) + strlen(resver) + remaining + 2;
+    if (fileSize <= block_size)
+        msgSize = strlen(file_name) + strlen(resver) + fileSize + 2;
     else
         msgSize = strlen(file_name) + strlen(resver) + block_size + 2;
 
-    char* buffer = new char[msgSize];
+    char* buffer = (char*)malloc(msgSize);
     if (!buffer)
     {
         perror("malloc");
-        file.close();
+        fclose(file);
         return -1;
     }
 
@@ -170,12 +176,28 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     *ptr = ' ';
     ptr++;
 
-    while (remaining > 0)
+    // 读取文件内容并写入 buffer
+    if (fileSize <= block_size)
+        fread(ptr, 1, fileSize, file);
+    else
+        fread(ptr, 1, block_size, file);
+
+    int ret = sendMsg(cfd, buffer, msgSize, SEND_FILE);
+
+    fileSize -= block_size;
+
+    if (fileSize <= block_size)
+    {
+        fclose(file);
+        free(buffer);
+        return ret;
+    }
+
+    while (fileSize > 0)
     {
         usleep(25000);
 
-        std::streamsize read_size = (remaining <= block_size) ? remaining : block_size;
-        file.read(ptr, read_size);
+        memset(buffer, 0, msgSize);
 
         char* ptr = buffer;
         strcpy(ptr, file_name);
@@ -186,32 +208,27 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
         ptr += strlen(resver);
         *ptr = ' ';
         ptr++;
-        int ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + read_size + 2, SEND_FILE_LONG);
-        if (ret < 0)
-        {
-            file.close();
-            delete[] buffer;
-            return ret;
-        }
 
-        remaining -= read_size;
-
-        if(fileSize > block_size)
-            sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
+        if (fileSize < block_size)
+            fread(ptr, 1, fileSize, file);
         else
-            sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 2, SEND_FILE_LONG);
-        
+            fread(ptr, 1, block_size, file);
+
+        if (fileSize > block_size)
+            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
+        else
+            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 2, SEND_FILE_LONG);
+
         fileSize -= block_size;
 
-        std::cout << "Progress: " << static_cast<double>(fileSize - remaining) * 100 / fileSize << "%\r";
-        std::cout.flush();
+        std::cout << "(while)fileSize: " << fileSize << '\n';
+    }
 
-    file.close();
-    delete[] buffer;
+    fclose(file);
+    free(buffer);
 
-    return ret;
+    return 0;
 }
-
 // 发送文件函数
 int sendFile(int cfd, const char* file_path, const char* to_file_path)
 {
@@ -243,8 +260,6 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
         return -1;
     }
 
-    std::cout << "msgSize: " << msgSize << '\n';
-
     // 将文件名、文件路径和接收方用户名写入 buffer，中间用空格分隔
     char* ptr = buffer;
     strcpy(ptr, to_file_path);
@@ -262,8 +277,6 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
 
     fileSize -= block_size;
 
-    std::cout << "fileSize: " << fileSize << '\n';
-
     if(fileSize <= block_size)
     {
         fclose(file);
@@ -273,7 +286,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
 
     while(fileSize > 0)
     {
-        usleep(20000);
+        usleep(25000);
 
         memset(buffer, 0, msgSize);
 
@@ -293,8 +306,6 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
         else
             ret = sendMsg(cfd, buffer, strlen(to_file_path) + fileSize + 1, SEND_FILE_LONG);
 
-        std::cout << "buffer: " << buffer << '\n';
-        
         fileSize -= block_size;
 
         std::cout << "(while)fileSize: " << fileSize << '\n';
@@ -369,12 +380,35 @@ int recvFile_long(int cfd, char* buffer, int ret, const char* file_path)
         return -1;
     }
 
-    std::cout << buffer << '\n';
-
     fwrite(buffer, 1, ret, file);
 
     fclose(file);
     return 0;
+}
+
+//下线通知好友函数
+void handleOffline(MYSQL* connect, int client_socket)
+{
+    std::string email = hashTable[client_socket];
+
+    std::string name = sql_getname(connect, email.c_str());
+    std::string offline = name + "下线了";
+
+    std::string friend_list;
+    if(sql_display_friend(connect, email.c_str(), friend_list) == 0)
+    {
+        std::cerr << "fail to get friend list\n";
+        return;
+    }
+
+    for(const auto& socket : hashTable)
+    {
+        if(friend_list.find(socket.second) != std::string::npos)
+        {
+            if(socket.first != client_socket)
+                sendMsg(socket.first, offline.c_str(), offline.size(), SERVER_MESSAGE);
+        }
+    }
 }
 
 void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets)
@@ -491,6 +525,25 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 
+    //上线通知好友
+    std::string name = sql_getname(connect, email.c_str());
+    std::string online = name + "上线了";
+
+    std::string friend_list;
+    if(sql_display_friend(connect, email.c_str(), friend_list) == 0)
+    {
+        std::cerr << "fail to get friend list\n";
+        return;
+    }
+
+    for(const auto& socket : hashTable)
+    {
+        if(friend_list.find(socket.second) != std::string::npos)
+        {
+            if(socket.first != client_socket)
+                sendMsg(socket.first, online.c_str(), online.size(), SERVER_MESSAGE);
+        }
+    }
 }
 
 void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
@@ -1169,7 +1222,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string group_name = j["group_name"];
-    std::string message = j["message"];
+    std::string message = j["msg"];
 
     //在message后加上发送时间
     time_t now = time(0);
@@ -1286,15 +1339,6 @@ void ServerhandleSendFile_long(char* msg, int len, int client_socket, MYSQL* con
     size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
 
     std::string savePath = "./server_file/" + sender + "_" + std::string(file_name);
-
-    int ret = sql_file_list(connect, file_name, savePath.c_str(), sender.c_str(), resver);
-
-    if(ret == 0)
-    {
-        std::string send = "发送文件失败，确定对方是你的朋友";
-        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
-        return;
-    }
 
     recvFile_long(client_socket, msg, msgSize, savePath.c_str());
 }

@@ -52,12 +52,12 @@ static void display_friend(int sfd)
 
 static void friend_menu(int sfd) 
 {
-    std::cout << "1.添加好友 2.删除好友\n";
-    std::cout << "3.屏蔽好友 4.解除屏蔽\n";
-    std::cout << "5.好友列表 6.返回\n";
-
     while(true)
     {
+        std::cout << "1.添加好友 2.删除好友\n";
+        std::cout << "3.屏蔽好友 4.解除屏蔽\n";
+        std::cout << "5.好友列表 6.返回\n";
+
         char command;
         std::cin >> command;
         clearInputBuffer();
@@ -70,11 +70,6 @@ static void friend_menu(int sfd)
             case '4':     unblock_friend(sfd);                      break;
             case '5':     display_friend(sfd);                      break;
             case '6':     std::cout << "退出好友操作界面\n";        return;
-            case 'h': 
-                          std::cout << "1.添加好友 2.删除好友\n";
-                          std::cout << "3.屏蔽好友 4.解除屏蔽\n";
-                          std::cout << "5.好友列表 6.返回\n";
-                          break;
         }
     }
 }
@@ -90,11 +85,14 @@ static void private_chat(int sfd)
 
     clearInputBuffer();
 
-    while (msg != "exit")
+    while (true)
     {
         std::getline(std::cin, msg); // 读取整行输入
 
-        std::cout << "msg: " << msg << '\n';
+        if(msg == "exit")
+        {
+            break;
+        }
 
         std::string final_msg = friend_email + " " + msg;
 
@@ -238,16 +236,17 @@ static void display_group_member(int sfd)
 
 static void group_menu(int sfd)
 {
-    std::cout << "群操作界面\n";
-    std::cout << "a.创建群聊    b.申请加入群聊\n";
-    std::cout << "c.退出群聊    d.解散群聊\n";
-    std::cout << "e.群聊列表    f.设置管理员\n";
-    std::cout << "g.取消管理员  i.踢人\n";
-    std::cout << "j.群聊成员    k.申请列表\n";
-    std::cout << "l.拉人进群    m.退出\n";
 
     while(true)
     {
+        std::cout << "群操作界面\n";
+        std::cout << "a.创建群聊    b.申请加入群聊\n";
+        std::cout << "c.退出群聊    d.解散群聊\n";
+        std::cout << "e.群聊列表    f.设置管理员\n";
+        std::cout << "g.取消管理员  i.踢人\n";
+        std::cout << "j.群聊成员    k.申请列表\n";
+        std::cout << "l.拉人进群    m.退出\n";
+
         char command;
         std::cin >> command;
         clearInputBuffer();
@@ -266,15 +265,6 @@ static void group_menu(int sfd)
             case 'k':    display_request_list(sfd); break;
             case 'l':    add_people_in_group(sfd);  break;
             case 'm':    std::cout << "退出群操作界面\n";         return;
-            case 'h': 
-                         std::cout << "群操作界面\n";
-                         std::cout << "a.创建群聊    b.加入群聊\n";
-                         std::cout << "c.退出群聊    d.解散群聊\n";
-                         std::cout << "e.群聊列表    f.设置管理员\n";
-                         std::cout << "g.删除管理员  i.踢人\n";
-                         std::cout << "j.群聊成员    k.申请列表\n";
-                         std::cout << "l.拉人进群    m.退出\n";
-                         break;
         }
     }
 }
@@ -290,11 +280,14 @@ void group_chat(int sfd)
 
     clearInputBuffer();
 
-    while (msg != "exit")
+    while (true)
     {
         std::getline(std::cin, msg); // 读取整行输入
 
-        std::cout << "msg: " << msg << '\n';
+        if(msg == "exit")
+        {
+            break;
+        }
 
         std::string final_msg = "{\"group_name\": \"" + group_name + "\", \"msg\": \"" + msg + "\" }";
 
@@ -376,13 +369,13 @@ void group_history(int sfd)
 
 void history_menu(int sfd)
 {
-    std::cout << "历史记录界面\n";
-    std::cout << "1.好友历史记录\n";
-    std::cout << "2.群历史记录\n";
-    std::cout << "3.返回\n";
-
     while(true)
     {
+        std::cout << "历史记录界面\n";
+        std::cout << "1.好友历史记录\n";
+        std::cout << "2.群历史记录\n";
+        std::cout << "3.返回\n";
+
         char command;
         std::cin >> command;
         clearInputBuffer();
@@ -392,27 +385,21 @@ void history_menu(int sfd)
             case '1':     firend_history(sfd);                      break; 
             case '2':     group_history(sfd);                       break;
             case '3':     std::cout << "退出历史记录界面\n";        return;
-            case 'h': 
-                          std::cout << "历史记录界面\n";
-                          std::cout << "1.好友历史记录\n";
-                          std::cout << "2.群历史记录\n";
-                          std::cout << "3.返回\n";
-                          break;
         }
     }
 }
 
 void commandMenu(int sfd)
 {
-    std::cout << "command界面\n";
-    std::cout << "1.私聊      2.群聊\n";
-    std::cout << "3.发送文件  4.查看文件\n";
-    std::cout << "5.好友操作  6.群操作\n";
-    std::cout << "7.接收文件  8.历史记录\n";
-    std::cout << "9.退出\n";
-
     while(true)
     {
+        std::cout << "command界面\n";
+        std::cout << "1.私聊      2.群聊\n";
+        std::cout << "3.发送文件  4.查看文件\n";
+        std::cout << "5.好友操作  6.群操作\n";
+        std::cout << "7.接收文件  8.历史记录\n";
+        std::cout << "9.退出\n";
+
         char command;
         std::cin >> command;
         clearInputBuffer(); // 清空输入缓冲区
@@ -428,14 +415,6 @@ void commandMenu(int sfd)
             case '7':     receive_file(sfd);                 break;
             case '8':     history_menu(sfd);                 break;
             case '9':     std::cout << "退出command界面\n";  return;
-            case 'h': 
-                          std::cout << "command界面\n";
-                          std::cout << "1.私聊      2.群聊\n";
-                          std::cout << "3.发送文件  4.查看文件\n";
-                          std::cout << "5.好友操作  6.群操作\n";
-                          std::cout << "7.接收文件  8.历史记录\n";
-                          std::cout << "9.退出\n";
-                          break;
         }
     }
 }

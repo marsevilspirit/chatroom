@@ -20,8 +20,6 @@ static int writen(int fd, const char* msg, int size)
     int count = size;
     while(count > 0)
     {
-        usleep(10000);
-
         int len = send(fd, buf, count, 0);
         if(len == -1)
         {
@@ -84,10 +82,7 @@ static int readn(int fd, char* buf, int size)
 
     while (count > 0)
     {
-        usleep(10000);
-
         int len = recv(fd, pt, count, 0);
-
         if (len == -1)
             return -1;
         else if (len == 0)
@@ -105,7 +100,6 @@ int recvMsg(int cfd, char** msg, Type* flag)
     int len = 0;
     if (readn(cfd, (char*)&len, 4) == -1) 
     {
-        std::cout << "len: " << len << '\n';
         return -1;
     }
 
@@ -180,7 +174,7 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
 
     while (fileSize > 0)
     {
-        usleep(25000);
+        usleep(20000);
 
         memset(buffer, 0, msgSize);
 
@@ -200,10 +194,10 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
             fread(ptr, 1, block_size, file);
 
         if(fileSize > block_size)
-            sendMsg(cfd, buffer, strlen(file_name)+ strlen(resver) + block_size + 1, SEND_FILE_LONG);
+            sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
         else
-            sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 1, SEND_FILE_LONG);
-
+            sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 2, SEND_FILE_LONG);
+        
         fileSize -= block_size;
 
         std::cout << "Progress: " << static_cast<double>(total - fileSize) * 100 / total << "%\r";
@@ -367,6 +361,8 @@ int recvFile_long(int cfd, char* buffer, int ret, const char* file_path)
         free(buffer);
         return -1;
     }
+
+    std::cout << buffer << '\n';
 
     fwrite(buffer, 1, ret, file);
 
@@ -1210,7 +1206,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string group_name = j["group_name"];
-    std::string message = j["msg"];
+    std::string message = j["message"];
 
     //在message后加上发送时间
     time_t now = time(0);
@@ -1327,6 +1323,15 @@ void ServerhandleSendFile_long(char* msg, int len, int client_socket, MYSQL* con
     size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
 
     std::string savePath = "./server_file/" + sender + "_" + std::string(file_name);
+
+    int ret = sql_file_list(connect, file_name, savePath.c_str(), sender.c_str(), resver);
+
+    if(ret == 0)
+    {
+        std::string send = "发送文件失败，确定对方是你的朋友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
 
     recvFile_long(client_socket, msg, msgSize, savePath.c_str());
 }

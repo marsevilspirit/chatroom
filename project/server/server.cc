@@ -108,8 +108,6 @@ void server::handleReceivedMessage(int client_socket)
 
         update_online_status(connect, hashTable[client_socket].c_str(), 0);
 
-        handleOffline(connect, client_socket);
-
         close(client_socket);
     }
     else if (ret == 0)
@@ -124,8 +122,6 @@ void server::handleReceivedMessage(int client_socket)
         }
 
         update_online_status(connect, hashTable[client_socket].c_str(), 0);
-
-        handleOffline(connect, client_socket);
 
         close(client_socket);
     }
@@ -219,8 +215,6 @@ void server::run()
                     std::cout << "Client disconnected by EPOLLERR | EPOLLHUP: " << events[i].data.fd << '\n';
 
                     update_online_status(connect, hashTable[events[i].data.fd].c_str(), 0);
-                
-                    handleOffline(connect, events[i].data.fd);
 
                     close(events[i].data.fd);
                 }

@@ -3,12 +3,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <sys/socket.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <netinet/in.h>
-#include <sys/stat.h>
 #include <cerrno>
 #include <vector>
 #include <unordered_map>

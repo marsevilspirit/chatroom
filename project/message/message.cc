@@ -1,5 +1,4 @@
 #include "message.h"
-#include <cstring>
 
 std::unordered_map<int, std::string> hashTable;
 
@@ -132,44 +131,31 @@ int recvMsg(int cfd, char** msg, Type* flag)
 // 发送文件函数
 int sendFile(int cfd, const char* file_name, const char* file_path, const char* resver)
 {
-    FILE* file = fopen(file_path, "rb");
-    if (!file)
+    std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+    if (!file.is_open())
     {
-        perror("fopen");
+        perror("ifstream");
         return -1;
     }
 
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-<<<<<<< HEAD
-    long total = fileSize;
-=======
->>>>>>> parent of d29220d (fix(sendfile) zero copy)
+    std::streamsize fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
 
     // 计算消息总大小
-    size_t msgSize;
     const size_t block_size = 409600;
 
-<<<<<<< HEAD
-    if(fileSize <= block_size)
-        msgSize = strlen(file_name) + fileSize + 1; // 加上空格的大小
+    std::streamsize remaining = fileSize;
+    size_t msgSize;
+    if (remaining <= block_size)
+        msgSize = strlen(file_name) + strlen(resver) + remaining + 2;
     else
-        msgSize = strlen(file_name) + block_size + 1; // 加上空格的大小
-=======
-    std::cout << "fileSize: " << fileSize << '\n';
+        msgSize = strlen(file_name) + strlen(resver) + block_size + 2;
 
-    if(fileSize <= block_size)
-        msgSize = strlen(file_name) + strlen(resver) + fileSize + 2; // 加上空格的大小
-    else
-        msgSize = strlen(file_name) + strlen(resver) + block_size + 2; // 加上空格的大小
->>>>>>> parent of d29220d (fix(sendfile) zero copy)
-
-    char* buffer = (char*)malloc(msgSize);
+    char* buffer = new char[msgSize];
     if (!buffer)
     {
         perror("malloc");
-        fclose(file);
+        file.close();
         return -1;
     }
 
@@ -184,33 +170,12 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     *ptr = ' ';
     ptr++;
 
-<<<<<<< HEAD
-    while (fileSize > 0)
-=======
-    // 读取文件内容并写入 buffer
-    if(fileSize < block_size)
-        fread(ptr, 1, fileSize, file);
-    else
-        fread(ptr, 1, block_size, file);
-    
-    fileSize -= block_size;
-
-    // 发送消息
-    int ret = sendMsg(cfd, buffer, msgSize, SEND_FILE);
-
-    if(fileSize <= block_size)
+    while (remaining > 0)
     {
-        fclose(file);
-        free(buffer);
-        return ret;
-    }
+        usleep(25000);
 
-    while(fileSize > 0)
->>>>>>> parent of d29220d (fix(sendfile) zero copy)
-    {
-        usleep(20000);
-
-        memset(buffer, 0, msgSize);
+        std::streamsize read_size = (remaining <= block_size) ? remaining : block_size;
+        file.read(ptr, read_size);
 
         char* ptr = buffer;
         strcpy(ptr, file_name);
@@ -221,12 +186,15 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
         ptr += strlen(resver);
         *ptr = ' ';
         ptr++;
-<<<<<<< HEAD
+        int ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + read_size + 2, SEND_FILE_LONG);
+        if (ret < 0)
+        {
+            file.close();
+            delete[] buffer;
+            return ret;
+        }
 
-        if(fileSize < block_size)
-            fread(ptr, 1, fileSize, file);
-        else
-            fread(ptr, 1, block_size, file);
+        remaining -= read_size;
 
         if(fileSize > block_size)
             sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
@@ -235,34 +203,11 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
         
         fileSize -= block_size;
 
-        std::cout << "Progress: " << static_cast<double>(total - fileSize) * 100 / total << "%\r";
+        std::cout << "Progress: " << static_cast<double>(fileSize - remaining) * 100 / fileSize << "%\r";
         std::cout.flush();
-=======
 
-        if(fileSize < block_size)
-            fread(ptr, 1, fileSize, file);
-        else
-            fread(ptr, 1, block_size, file);
-
-        if(fileSize > block_size)
-        {
-            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
-        }
-        else
-        {
-            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 2, SEND_FILE_LONG);
-        }
-
-        std::cout << "ret: " << ret << '\n';
-        
-        fileSize -= block_size;
-
-        std::cout << "(while)fileSize: " << fileSize << '\n';
->>>>>>> parent of d29220d (fix(sendfile) zero copy)
-    }
-
-    fclose(file);
-    free(buffer);
+    file.close();
+    delete[] buffer;
 
     return ret;
 }
@@ -280,7 +225,6 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
     fseek(file, 0, SEEK_END);
     long fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
-    long total = fileSize;
 
     // 计算消息总大小
     size_t msgSize;
@@ -353,7 +297,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
         
         fileSize -= block_size;
 
-        std::cout << "Progress: " << static_cast<double>(total - fileSize) * 100 / total << "%\r";
+        std::cout << "(while)fileSize: " << fileSize << '\n';
     }
 
     fclose(file);

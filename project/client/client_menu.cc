@@ -173,11 +173,13 @@ static int ClienthandleLogin(int sfd)
     std::cout << "输入账号: ";
     std::cin >> email;
 
+    /*
     if (!is_valid_email(email.c_str()))
     {
         std::cout << "邮箱格式不对\n";
         return 0;
     }
+    */
 
     std::cout << "输入密码: ";
 

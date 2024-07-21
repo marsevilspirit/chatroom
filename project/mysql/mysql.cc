@@ -1,4 +1,5 @@
 #include "mysql.h"
+#include <mysql/mysql.h>
 
 MYSQL* sql_init(MYSQL* connect)
 {
@@ -7,11 +8,25 @@ MYSQL* sql_init(MYSQL* connect)
         std::cerr << "Error initializing MySQL connection\n";
     }
 
-    // 连接 MySQL 数据库
-    if (!mysql_real_connect(connect, "localhost", "mars", "661188", "chatroom", 0, nullptr, 0)) 
-    {
-        std::cerr << "Error connecting to MySQL database: " << mysql_error(connect) << '\n';
+    // 连接 MySQL 服务器（此处数据库名可以是任意存在的数据库，如 "mysql"）
+    if (!mysql_real_connect(connect, "localhost", "root", "661188", nullptr, 0, nullptr, 0)) {
+        std::cerr << "Error connecting to MySQL server: " << mysql_error(connect) << '\n';
         mysql_close(connect);
+        return nullptr;
+    }
+
+    // 创建 chatroom 数据库
+    if (mysql_query(connect, "CREATE DATABASE IF NOT EXISTS chatroom")) {
+        std::cerr << "Error creating database: " << mysql_error(connect) << '\n';
+        mysql_close(connect);
+        return nullptr;
+    }
+
+    // 选择 chatroom 数据库
+    if (mysql_select_db(connect, "chatroom")) {
+        std::cerr << "Error selecting database: " << mysql_error(connect) << '\n';
+        mysql_close(connect);
+        return nullptr;
     }
 
     // 创建账户表格

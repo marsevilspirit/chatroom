@@ -44,15 +44,8 @@ void sendMessageThread(int sfd)
             continue;
         }
 
-        if (sendMsg(sfd, msg.c_str(), msg.size(), WORLD_MESSAGE) == -1) 
-        {
-            std::cout << "无效信息，发送失败\n\n";
-            continue;
-        }
+        sendMsg(sfd, msg.c_str(), msg.size(), WORLD_MESSAGE);
 
-        std::cout << '\n';
-
-        usleep(10000);
     }
 }
 
@@ -98,13 +91,13 @@ void receiveMessageThread(int sfd)
         int len = recvMsg(sfd, &msg, &flag);
         switch (flag)
         {
-            case GROUP_MESSAGE:     std::cout << "GROUP_MESSAGE\n";         break;
-            case PRIVATE_MESSAGE:   std::cout << "PRIVATE_MESSAGE\n";       break;
-            case SERVER_MESSAGE:    std::cout << "SERVER_MESSAGE\n";        break;
-            case WORLD_MESSAGE:     std::cout << "WORLD_MESSAGE\n";         break;
+            case GROUP_MESSAGE:     std::cout << "群聊\n";                  break;
+            case PRIVATE_MESSAGE:   std::cout << "私聊\n";                  break;
+            case SERVER_MESSAGE:    std::cout << "服务器信息\n";            break;
+            case WORLD_MESSAGE:     std::cout << "全服\n";                  break;
             case SEND_FILE:         real_file_resv(msg, sfd, len);          break;
             case SEND_FILE_LONG:    real_file_resv_long(msg, sfd, len);     break;
-            default:                std::cout << "UNKNOWN\n";               break;
+            default:                std::cout << "未知错误\n";              break;
         }
         if (len == -1) 
         {

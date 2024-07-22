@@ -497,6 +497,7 @@ void enterChatroom(int sfd)
     {
         std::cout << "1.注册     2.登录\n";
         std::cout << "3.忘记密码 4.删除账号\n";
+        std::cout << "5.退出\n";
         std::cout << "输入选项：";
 
         int choice;
@@ -511,6 +512,7 @@ void enterChatroom(int sfd)
                     break;
             case 3: ClienthandleForgetPasswd(sfd); break;
             case 4: ClienthandleDeleteAccount(sfd); break;
+            case 5: exit(EXIT_SUCCESS);
             default: std::cout << "无效选项\n";
         }
     }

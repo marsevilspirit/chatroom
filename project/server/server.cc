@@ -93,80 +93,95 @@ void server::handleReceivedMessage(int client_socket)
 {
     Type flag;
     char* msg = nullptr;
-    int ret = recvMsg(client_socket, &msg, &flag);
-    std::cout << "flag: " << flag << '\n';
-    std::cout << "ret: " << ret << '\n';
-    if(ret == -1)
+
+    while(1)
     {
-        std::cerr << "Failed to receive message from client_socket: " << client_socket << '\n';
-        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, nullptr);
-        auto it = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
-        if (it != client_sockets.end()) 
+        int ret = recvMsg(client_socket, &msg, &flag);
+        //std::cout << "flag: " << flag << '\n';
+        //std::cout << "ret: " << ret << '\n';
+        if(ret == -1)
         {
-            client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
-        }
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                // 已经读取完所有可用数据
+                std::cout << "读完了\n";
+                return;
+            }
 
-        update_online_status(connect, hashTable[client_socket].c_str(), 0);
+            std::cerr << "Failed to receive message from client_socket: " << client_socket << '\n';
+            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, nullptr);
+            auto it = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
+            if (it != client_sockets.end()) 
+            {
+                client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
+            }
 
-        handleOffline(connect, client_socket);
-
-        close(client_socket);
-    }
-    else if (ret == 0)
-    {
-        // 客户端断开连接
-        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, nullptr);
-        std::cout << "(ret == 0)Client disconnected: " << client_socket << '\n';
-        auto it = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
-        if (it != client_sockets.end()) 
-        {
-            client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
-        }
-
-        if (!hashTable[client_socket].empty())
-        {
             update_online_status(connect, hashTable[client_socket].c_str(), 0);
 
             handleOffline(connect, client_socket);
+
+            close(client_socket);
+
+            return;
+        }
+        else if (ret == 0)
+        {
+            // 客户端断开连接
+            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, nullptr);
+            std::cout << "(ret == 0)Client disconnected: " << client_socket << '\n';
+            auto it = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
+            if (it != client_sockets.end()) 
+            {
+                client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
+            }
+
+            if (!hashTable[client_socket].empty())
+            {
+                update_online_status(connect, hashTable[client_socket].c_str(), 0);
+
+                handleOffline(connect, client_socket);
+            }
+
+            close(client_socket);
+
+            return;
+        }
+        else
+        {
+            switch (flag)
+            {
+                case WORLD_MESSAGE:         handleWorldMessage(connect, msg, client_socket, client_sockets);                     break;
+                case REGISTER:              threadPool.enqueue(ServerhandleRegister, msg, client_socket, connect);               break;
+                case LOGIN:                 ServerhandleLogin(msg, client_socket, connect);                                      break;
+                case FORGET_PASSWD:         threadPool.enqueue(ServerhandleForgetPasswd, msg, client_socket, connect);           break;
+                case DELETE_ACCOUNT:        threadPool.enqueue(ServerhandleDeleteAccount, msg, client_socket, connect);          break;
+                case ADD_FRIEND:            threadPool.enqueue(ServerhandleAddFriend, msg, client_socket, connect);              break;
+                case DELETE_FRIEND:         threadPool.enqueue(ServerhandleDeleteFriend, msg, client_socket, connect);           break;
+                case BLOCK_FRIEND:          threadPool.enqueue(ServerhandleBlockFriend, msg, client_socket, connect);            break;
+                case UNBLOCK_FRIEND:        threadPool.enqueue(ServerhandleUnblockFriend, msg, client_socket, connect);          break;
+                case DISPLAY_FRIEND:        threadPool.enqueue(ServerhandleDisplayFriend, msg, client_socket, connect);          break;
+                case PRIVATE_MESSAGE:       ServerhandlePrivateMessage(msg, client_socket, connect);                             break;
+                case CREATE_GROUP:          threadPool.enqueue(ServerhandleCreateGroup, msg, client_socket, connect);            break;
+                case DELETE_GROUP:          threadPool.enqueue(ServerhandleDeleteGroup, msg, client_socket, connect);            break;
+                case JOIN_GROUP:            threadPool.enqueue(ServerhandleRequestJoinGroup, msg, client_socket, connect);       break;
+                case EXIT_GROUP:            threadPool.enqueue(ServerhandleExitGroup, msg, client_socket, connect);              break;
+                case DISPLAY_GROUP:         threadPool.enqueue(ServerhandleDisplayGroupList, client_socket, connect);            break;
+                case DISPLAY_GROUP_REQUEST: threadPool.enqueue(ServerhandleDisplayRequestList, msg, client_socket, connect);     break;
+                case SET_MANAGER:           threadPool.enqueue(ServerhandleSetManager, msg, client_socket, connect);             break;
+                case ADD_GROUP:             threadPool.enqueue(ServerhandleAddGroup, msg, client_socket, connect);               break;
+                case CANCEL_MANAGER:        threadPool.enqueue(ServerhandleCancelManager, msg, client_socket, connect);          break;
+                case KICK_SOMEBODY:         threadPool.enqueue(ServerhandleKickSomebody, msg, client_socket, connect);           break;
+                case DISPLAY_GROUP_MEMBER:  threadPool.enqueue(ServerhandleDisplayGroupMember, msg, client_socket, connect);     break;
+                case GROUP_MESSAGE:         ServerhandleGroupMessage(msg, client_socket, connect);                               break;
+                case SEND_FILE:             threadPool.enqueue(ServerhandleSendFile, msg, ret, client_socket, connect);          break;
+                case SEND_FILE_LONG:        threadPool.enqueue(ServerhandleSendFile_long, msg, ret, client_socket, connect);     break;
+                case CHECK_FILE:            threadPool.enqueue(ServerhandleCheckFile, msg, client_socket, connect);              break;
+                case RECEIVE_FILE:          threadPool.enqueue(ServerhandleReceiveFile, msg, client_socket, connect);            break;
+                case FRIEND_HISTORY:        threadPool.enqueue(ServerhandleFriendHistory, msg, client_socket, connect);          break;
+                case GROUP_HISTORY:         threadPool.enqueue(ServerhandleGroupHistory, msg, client_socket, connect);           break;
+                default:                    std::cerr << "Unknown message type\n";                                               break;
+            }
         }
 
-        close(client_socket);
-    }
-    else
-    {
-        switch (flag)
-        {
-            case WORLD_MESSAGE:         handleWorldMessage(connect, msg, client_socket, client_sockets);                     break;
-            case REGISTER:              threadPool.enqueue(ServerhandleRegister, msg, client_socket, connect);               break;
-            case LOGIN:                 ServerhandleLogin(msg, client_socket, connect);                                      break;
-            case FORGET_PASSWD:         threadPool.enqueue(ServerhandleForgetPasswd, msg, client_socket, connect);           break;
-            case DELETE_ACCOUNT:        threadPool.enqueue(ServerhandleDeleteAccount, msg, client_socket, connect);          break;
-            case ADD_FRIEND:            threadPool.enqueue(ServerhandleAddFriend, msg, client_socket, connect);              break;
-            case DELETE_FRIEND:         threadPool.enqueue(ServerhandleDeleteFriend, msg, client_socket, connect);           break;
-            case BLOCK_FRIEND:          threadPool.enqueue(ServerhandleBlockFriend, msg, client_socket, connect);            break;
-            case UNBLOCK_FRIEND:        threadPool.enqueue(ServerhandleUnblockFriend, msg, client_socket, connect);          break;
-            case DISPLAY_FRIEND:        threadPool.enqueue(ServerhandleDisplayFriend, msg, client_socket, connect);          break;
-            case PRIVATE_MESSAGE:       ServerhandlePrivateMessage(msg, client_socket, connect);                             break;
-            case CREATE_GROUP:          threadPool.enqueue(ServerhandleCreateGroup, msg, client_socket, connect);            break;
-            case DELETE_GROUP:          threadPool.enqueue(ServerhandleDeleteGroup, msg, client_socket, connect);            break;
-            case JOIN_GROUP:            threadPool.enqueue(ServerhandleRequestJoinGroup, msg, client_socket, connect);       break;
-            case EXIT_GROUP:            threadPool.enqueue(ServerhandleExitGroup, msg, client_socket, connect);              break;
-            case DISPLAY_GROUP:         threadPool.enqueue(ServerhandleDisplayGroupList, client_socket, connect);            break;
-            case DISPLAY_GROUP_REQUEST: threadPool.enqueue(ServerhandleDisplayRequestList, msg, client_socket, connect);     break;
-            case SET_MANAGER:           threadPool.enqueue(ServerhandleSetManager, msg, client_socket, connect);             break;
-            case ADD_GROUP:             threadPool.enqueue(ServerhandleAddGroup, msg, client_socket, connect);               break;
-            case CANCEL_MANAGER:        threadPool.enqueue(ServerhandleCancelManager, msg, client_socket, connect);          break;
-            case KICK_SOMEBODY:         threadPool.enqueue(ServerhandleKickSomebody, msg, client_socket, connect);           break;
-            case DISPLAY_GROUP_MEMBER:  threadPool.enqueue(ServerhandleDisplayGroupMember, msg, client_socket, connect);     break;
-            case GROUP_MESSAGE:         ServerhandleGroupMessage(msg, client_socket, connect);                               break;
-            case SEND_FILE:             threadPool.enqueue(ServerhandleSendFile, msg, ret, client_socket, connect);          break;
-            case SEND_FILE_LONG:        threadPool.enqueue(ServerhandleSendFile_long, msg, ret, client_socket, connect);     break;
-            case CHECK_FILE:            threadPool.enqueue(ServerhandleCheckFile, msg, client_socket, connect);              break;
-            case RECEIVE_FILE:          threadPool.enqueue(ServerhandleReceiveFile, msg, client_socket, connect);            break;
-            case FRIEND_HISTORY:        threadPool.enqueue(ServerhandleFriendHistory, msg, client_socket, connect);          break;
-            case GROUP_HISTORY:         threadPool.enqueue(ServerhandleGroupHistory, msg, client_socket, connect);           break;
-            default:                    std::cerr << "Unknown message type\n";                                               break;
-        }
     }
 }
 
@@ -203,7 +218,7 @@ void server::run()
                 setFdNoblock(client_socket);//不让客户端堵塞
 
                 epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_socket, &event);
-                  
+
                 std::cout << "client on line client_socket: " << client_socket << '\n';
                 client_sockets.push_back(client_socket);
                 //threadPool.enqueue(&server::handleClientConnect, this, client_socket);//---------------to do
@@ -222,7 +237,7 @@ void server::run()
                     std::cout << "Client disconnected by EPOLLERR | EPOLLHUP: " << events[i].data.fd << '\n';
 
                     update_online_status(connect, hashTable[events[i].data.fd].c_str(), 0);
-                
+
                     handleOffline(connect, events[i].data.fd);
 
                     close(events[i].data.fd);

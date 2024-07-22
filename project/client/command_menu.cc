@@ -289,7 +289,7 @@ void group_chat(int sfd)
             break;
         }
 
-        std::string final_msg = "{\"group_name\": \"" + group_name + "\", \"msg\": \"" + msg + "\" }";
+        std::string final_msg = group_name + " " + msg;
 
         usleep(1000); // 暂停一毫秒
 
@@ -335,7 +335,7 @@ void receive_file(int sfd)
     std::cin >> file_name;
 
     std::string file_path;
-    std::cout << "请输入文件存储路径: ";
+    std::cout << "请输入文件存储路径(包括文件名): ";
     std::cin >> file_path;
 
     std::string send = friend_email + " " + file_name + " " + file_path;

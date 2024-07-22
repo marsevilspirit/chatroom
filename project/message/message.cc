@@ -284,6 +284,8 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
         return ret;
     }
 
+    std::cout << "文件传输中" << '\n';
+
     while(fileSize > 0)
     {
         usleep(25000);
@@ -308,8 +310,10 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
 
         fileSize -= block_size;
 
-        std::cout << "(while)fileSize: " << fileSize << '\n';
+        //std::cout << "(while)fileSize: " << fileSize << '\n';
     }
+
+    std::cout << "文件传输完成" << '\n';
 
     fclose(file);
     free(buffer);
@@ -392,7 +396,7 @@ void handleOffline(MYSQL* connect, int client_socket)
     std::string email = hashTable[client_socket];
 
     std::string name = sql_getname(connect, email.c_str());
-    std::string offline = name + "下线了";
+    std::string offline = "你的朋友" + name + "下线了";
 
     std::string friend_list;
 
@@ -1223,9 +1227,18 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 
     std::cout << "user want to send group message: " << client_socket << '\n'; 
 
-    nlohmann::json j = nlohmann::json::parse(std::string(msg));
-    std::string group_name = j["group_name"];
-    std::string message = j["msg"];
+    char* group_name = msg;
+
+    while(*msg != ' ' && *msg != '\0')
+        msg++;
+
+    *msg = '\0';
+
+    msg++;
+
+    char* message = msg;
+
+    std::cout << "group_name: " << group_name << " message: " << message << '\n';
 
     //在message后加上发送时间
     time_t now = time(0);
@@ -1235,7 +1248,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 
     std::string send = sql_getname(connect, my_email.c_str()) + ": ("+ time + ") from " + std::string(group_name) + "\n" + message + "\n";
 
-    if(if_group_exist(connect, group_name.c_str()) == 1)
+    if(if_group_exist(connect, group_name)== 1)
     {
         send = "群组不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
@@ -1244,7 +1257,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 
     std::string group_member;
 
-    int ret = sql_display_group_member_without_request(connect, my_email.c_str(), group_name.c_str(), group_member);
+    int ret = sql_display_group_member_without_request(connect, my_email.c_str(), group_name, group_member);
 
     if(ret == 0)
     {
@@ -1267,7 +1280,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
         }
     }
 
-    add_group_message_list(connect, my_email.c_str(), group_name.c_str(), message.c_str());
+    add_group_message_list(connect, my_email.c_str(), group_name, message);
 }
 
 void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)

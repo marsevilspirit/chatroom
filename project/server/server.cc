@@ -116,16 +116,19 @@ void server::handleReceivedMessage(int client_socket)
     {
         // 客户端断开连接
         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, nullptr);
-        std::cout << "Client disconnected: " << client_socket << '\n';
+        std::cout << "(ret == 0)Client disconnected: " << client_socket << '\n';
         auto it = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
         if (it != client_sockets.end()) 
         {
             client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
         }
 
-        update_online_status(connect, hashTable[client_socket].c_str(), 0);
+        if (!hashTable[client_socket].empty())
+        {
+            update_online_status(connect, hashTable[client_socket].c_str(), 0);
 
-        handleOffline(connect, client_socket);
+            handleOffline(connect, client_socket);
+        }
 
         close(client_socket);
     }

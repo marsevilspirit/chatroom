@@ -395,6 +395,7 @@ void handleOffline(MYSQL* connect, int client_socket)
     std::string offline = name + "下线了";
 
     std::string friend_list;
+
     if(sql_display_friend(connect, email.c_str(), friend_list) == 0)
     {
         std::cerr << "fail to get friend list\n";
@@ -443,6 +444,8 @@ void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
     if(sql_insert(connect, email.c_str(), password.c_str(), name.c_str()) == 0)
     {
         send = "该账号已注册"; 
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
     }
     else 
     {

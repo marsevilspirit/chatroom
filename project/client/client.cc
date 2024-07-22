@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #define PORT_NUM 8000
-#define IP "127.0.0.1"
+#define IP "10.30.0.148"
 
 std::mutex mtx; // 互斥量，用于保护标准输出
 

@@ -1,8 +1,7 @@
-build/
 *.o
 *.a
 Makefile
 CMakeCache.txt
 CMakeFiles/
 *.cmake 
-build/server_file/
+/build

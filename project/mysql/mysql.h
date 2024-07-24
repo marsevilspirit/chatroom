@@ -34,6 +34,8 @@ bool is_your_friend_or_request(MYSQL* connect, const char* email, const char* fr
 
 bool is_your_friend(MYSQL* connect, const char* email, const char* friend_email);
 
+bool is_your_friend_or_block(MYSQL* connect, const char* email, const char* friend_email);
+
 bool is_my_friend_or_request(MYSQL* connect, const char* email, const char* friend_email);
 
 bool is_my_friend(MYSQL* connect, const char* email, const char* friend_email);
@@ -50,6 +52,7 @@ int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_ema
 
 int sql_display_friend(MYSQL* connect, const char* email, std::string& send);
 
+std::string getTypeByEmail(MYSQL* connect, const std::string& list, const std::string& email);
 
 //--------------------------------------------------------------------------------
 int if_group_exist(MYSQL* connect, const char* group_name);

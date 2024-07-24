@@ -98,11 +98,7 @@ static void private_chat(int sfd)
 
         usleep(1000); // 暂停一毫秒
 
-        if (sendMsg(sfd, final_msg.c_str(), final_msg.size(), PRIVATE_MESSAGE) == -1) 
-        {
-            std::cout << "无效信息，发送失败\n\n";
-            continue;
-        }
+        sendMsg(sfd, final_msg.c_str(), final_msg.size(), PRIVATE_MESSAGE);
 
         std::cout << '\n';
 

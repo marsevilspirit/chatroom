@@ -107,8 +107,6 @@ int sql_select(MYSQL* connect, const char* email, const char* password)
     // 构建 SQL 查询语句
     std::string query = "SELECT 1 FROM accounts WHERE email='" + std::string(email) + "' AND password='" + std::string(password) + "' LIMIT 1";
 
-    std::cout << query << '\n';
-
     // 执行 SQL 查询
     if (mysql_query(connect, query.c_str())) 
     {
@@ -132,6 +130,41 @@ int sql_select(MYSQL* connect, const char* email, const char* password)
 
     // 返回查询结果，1 表示匹配，0 表示不匹配
     return (count > 0) ? 1 : 0;
+}
+
+std::string getTypeByEmail(MYSQL* connect, const std::string& list, const std::string& email)
+{
+    // 创建查询字符串
+    std::string query = "SELECT type FROM " + list + " WHERE email = '" + email + "';";
+
+    // 执行查询
+    if (mysql_query(connect, query.c_str())) {
+        std::cerr << "MySQL query error: " << mysql_error(connect) << std::endl;
+        return "";
+    }
+
+    // 获取查询结果
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr) {
+        std::cerr << "MySQL store result error: " << mysql_error(connect) << std::endl;
+        return "";
+    }
+
+    // 获取结果中的一行
+    MYSQL_ROW row = mysql_fetch_row(result);
+    std::string type;
+
+    if (row) {
+        type = row[0];
+    } else {
+        std::cerr << "No result found for email: " << email << std::endl;
+        type = "";
+    }
+
+    // 释放结果集
+    mysql_free_result(result);
+
+    return type;
 }
 
 int if_exist(MYSQL* connect, const char* email)// 1存在，0不存在
@@ -430,6 +463,7 @@ bool is_your_friend(MYSQL* connect, const char* email, const char* friend_email)
         emailStr = emailStr.substr(0, pos);
     }
 
+    /*
     std::string query = "SELECT COUNT(*) FROM " + emailStr + "_list WHERE email = '" + std::string(email) + "' AND type = 'friend'";
 
     if (mysql_query(connect, query.c_str())) 
@@ -454,6 +488,27 @@ bool is_your_friend(MYSQL* connect, const char* email, const char* friend_email)
 
     mysql_free_result(result);
     return true; // 是好友
+    */
+
+    std::string type = getTypeByEmail(connect, emailStr, email);
+
+    return type == "friend";
+}
+
+bool is_your_friend_or_block(MYSQL* connect, const char *email, const char *friend_email)
+{
+    std::string emailStr = std::string(friend_email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+    
+    std::string type = getTypeByEmail(connect, emailStr, email);
+
+    return type == "friend" || type == "block";
 }
 
 bool is_my_friend_or_request(MYSQL* connect, const char* email, const char* friend_email)

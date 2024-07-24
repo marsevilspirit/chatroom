@@ -193,6 +193,8 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
         return ret;
     }
 
+    std::cout << "文件上传中" << '\n';
+
     while (fileSize > 0)
     {
         usleep(25000);
@@ -215,14 +217,14 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
             fread(ptr, 1, block_size, file);
 
         if (fileSize > block_size)
-            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
+            sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + block_size + 2, SEND_FILE_LONG);
         else
-            ret = sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 2, SEND_FILE_LONG);
+            sendMsg(cfd, buffer, strlen(file_name) + strlen(resver) + fileSize + 2, SEND_FILE_LONG);
 
         fileSize -= block_size;
-
-        std::cout << "(while)fileSize: " << fileSize << '\n';
     }
+
+    std::cout << "文件上传完成" << '\n';
 
     fclose(file);
     free(buffer);
@@ -304,9 +306,9 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
             fread(ptr, 1, block_size, file);
 
         if(fileSize > block_size)
-            ret = sendMsg(cfd, buffer, strlen(to_file_path) + block_size + 1, SEND_FILE_LONG);
+            sendMsg(cfd, buffer, strlen(to_file_path) + block_size + 1, SEND_FILE_LONG);
         else
-            ret = sendMsg(cfd, buffer, strlen(to_file_path) + fileSize + 1, SEND_FILE_LONG);
+            sendMsg(cfd, buffer, strlen(to_file_path) + fileSize + 1, SEND_FILE_LONG);
 
         fileSize -= block_size;
 
@@ -487,8 +489,6 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 
     std::string email = j["email"];
     std::string password = j["passwd"];
-
-    std::cout << email << " " << password << '\n';
 
     int ret = sql_online(connect, email.c_str());
 
@@ -819,16 +819,47 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
 
     std::string send = sql_getname(connect, email.c_str()) + ": ("+ time + ")\n" + message + "\n";
 
-    if(!is_your_friend(connect, email.c_str(), friend_email))
+    /*
+
+    if(!is_your_friend_or_block(connect, email.c_str(), friend_email))
     {
-        send = "您不是对方好友";
+        send = "您不是" + std::string(friend_email) + "好友";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
     if(sql_if_block(connect, email.c_str(), friend_email))
     {
-        send = "您已被对方屏蔽";
+        send = "您已被" + std::string(friend_email) + "屏蔽";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    */
+
+    std::string emailStr = std::string(friend_email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos) + "_list";
+    }
+
+    std::cout << "emailStr: " << emailStr << '\n';
+
+    std::string type = getTypeByEmail(connect, emailStr, email);
+
+    if(type == "request")
+    { 
+        send = "您不是" + std::string(friend_email) + "好友";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    if(type == "block")
+    {
+        send = "您已被" + std::string(friend_email) + "屏蔽";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
@@ -838,7 +869,7 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
 
     if(sql_if_online(connect, friend_email) == 0)
     {
-        send = "对方不在线";
+        send = std::string(friend_email) + "不在线";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }

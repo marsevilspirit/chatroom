@@ -1,14 +1,13 @@
 # 添加 threadpool 目标及其源文件
-add_library(message
-    message.cc 
-    message.h
-    ../json.hpp
+add_library(log
+    mars_logger.h 
+    mars_logger.cc
 )
 
-target_link_libraries(message log mysql)
+target_link_libraries(log -lfmt -lstdc++fs -ljsoncpp)
 
 # 设置头文件路径（如果有头文件的话）
-target_include_directories(message
+target_include_directories(log
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

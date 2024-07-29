@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_subdirectory(project/server)
 add_subdirectory(project/threadpool)
 add_subdirectory(project/message)
+add_subdirectory(project/log)
+add_subdirectory(project/mysql)
 
 add_executable(chatroom 
     project/main.cc
@@ -23,12 +25,7 @@ add_executable(client
 
 target_link_libraries(chatroom server)
 
-target_link_libraries(client message -lesmtp -lmysqlclient -lssl -lcrypto -lpthread)
-
-#target_include_directories(chatroom
-#    PUBLIC
-#    project/server
-#)
+target_link_libraries(client message -lesmtp -lssl -lcrypto)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 

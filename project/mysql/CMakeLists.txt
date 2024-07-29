@@ -5,6 +5,8 @@ add_library(mysql
     mysql_group.cc
 )
 
+target_link_libraries(mysql -lmysqlclient)
+
 # 设置头文件路径（如果有头文件的话）
 target_include_directories(mysql
     PUBLIC

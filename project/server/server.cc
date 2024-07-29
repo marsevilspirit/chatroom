@@ -84,10 +84,11 @@ server::~server()
     mysql_close(connect);
 }
 
+/*
 void server::handleClientConnect(int client_socket)//没写
 {
-    printf("success!!!\n");
 }
+*/
 
 void server::handleReceivedMessage(int client_socket)
 {
@@ -97,17 +98,16 @@ void server::handleReceivedMessage(int client_socket)
     while(1)
     {
         int ret = recvMsg(client_socket, &msg, &flag);
-        //std::cout << "flag: " << flag << '\n';
-        //std::cout << "ret: " << ret << '\n';
+        LogTrace("flag: {}, ret: {}", int(flag), ret);
         if(ret == -1)
         {
             if (errno == EWOULDBLOCK || errno == EAGAIN) {
                 // 已经读取完所有可用数据
-                std::cout << "读完了\n";
+                LogInfo("客户端{}读取完所有可用数据", client_socket);
                 return;
             }
 
-            std::cerr << "Failed to receive message from client_socket: " << client_socket << '\n';
+            LogInfo("(ret == -1)客户端{}断开连接", client_socket);
             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, nullptr);
             auto it = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
             if (it != client_sockets.end()) 
@@ -127,7 +127,7 @@ void server::handleReceivedMessage(int client_socket)
         {
             // 客户端断开连接
             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, nullptr);
-            std::cout << "(ret == 0)Client disconnected: " << client_socket << '\n';
+            LogInfo("(ret == 0)客户端{}断开连接", client_socket);
             auto it = std::find(client_sockets.begin(), client_sockets.end(), client_socket);
             if (it != client_sockets.end()) 
             {
@@ -178,7 +178,8 @@ void server::handleReceivedMessage(int client_socket)
                 case RECEIVE_FILE:          threadPool.enqueue(ServerhandleReceiveFile, msg, client_socket, connect);            break;
                 case FRIEND_HISTORY:        threadPool.enqueue(ServerhandleFriendHistory, msg, client_socket, connect);          break;
                 case GROUP_HISTORY:         threadPool.enqueue(ServerhandleGroupHistory, msg, client_socket, connect);           break;
-                default:                    std::cerr << "Unknown message type\n";                                               break;
+                case HEART_BEAT:            threadPool.enqueue(ServerhandleHeartBeat, msg,  client_socket);                      break;
+                default:                    LogError("Unknown message type");                                                    break;
             }
         }
 
@@ -206,11 +207,11 @@ void server::run()
         {
             if(events[i].data.fd == server_socket)//server_socket有事，说明有人要连咱们
             {
-                std::cout << "accepting new client...\n";
+                LogInfo("接受新的客户端{}连接", server_socket);
                 int client_socket = accept(server_socket, nullptr, nullptr);
                 if(client_socket == -1)
                 {
-                    std::cerr << "Failed to accept client connection\n";
+                    LogError("Failed to accept client connection");
                     continue;
                 }
                 event.events = EPOLLIN | EPOLLET;
@@ -219,10 +220,9 @@ void server::run()
 
                 epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_socket, &event);
 
-                std::cout << "client on line client_socket: " << client_socket << '\n';
                 client_sockets.push_back(client_socket);
                 //threadPool.enqueue(&server::handleClientConnect, this, client_socket);//---------------to do
-                server::handleClientConnect(client_socket);
+                //server::handleClientConnect(client_socket);
             }
             else//不是server_socket有事
             {
@@ -234,7 +234,8 @@ void server::run()
                     {
                         client_sockets.erase(it); // 从客户端套接字集合中移除该套接字
                     }
-                    std::cout << "Client disconnected by EPOLLERR | EPOLLHUP: " << events[i].data.fd << '\n';
+
+                    LogInfo("Client disconnected by EPOLLERR | EPOLLHUP: {}", events[i].data.fd);
 
                     update_online_status(connect, hashTable[events[i].data.fd].c_str(), 0);
 
@@ -251,7 +252,7 @@ void server::run()
                 else if(events[i].events & EPOLLOUT)//发送信息
                 {
                     //todo-------------------------
-                    std::cout << "EPOLLOUT\n";
+                    LogInfo("EPOLLOUT");
                 }
             }
         }

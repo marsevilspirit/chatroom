@@ -420,8 +420,7 @@ void handleOffline(MYSQL* connect, int client_socket)
 
 void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vector<int>& client_sockets)
 {
-    std::cout << "Received message from client: " << hashTable[client_socket] << '\n';
-    std::cout << msg << '\n';
+    LogInfo("收到了{}的向全服发送消息", hashTable[client_socket]);
 
     std::string send = sql_getname(connect, hashTable[client_socket].c_str()) + ": \n" + msg;
 
@@ -438,38 +437,39 @@ void handleWorldMessage(MYSQL* connect, char* msg, int client_socket, std::vecto
 
 void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
 {
-    std::cout << "New user want to register: " << client_socket << '\n';
-
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
+
     std::string email = j["email"];
     std::string password = j["passwd"];
     std::string name = j["name"];
+
+    LogInfo("{}用户想要注册", email);
 
     std::string send;
 
     if(sql_insert(connect, email.c_str(), password.c_str(), name.c_str()) == 0)
     {
         send = "该账号已注册"; 
+        LogInfo("注册失败, 该账号已注册");
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
     else 
     {
-        std::cout << email << " " << password << " " << name << '\n';
-
+        LogInfo("{}用户注册成功", email);
         send = "注册成功";
     }
 
     //为注册的用户创建列表
     if(sql_create_list(connect, email.c_str()) == 0)
     {
-        std::cerr << "fail to create friend table\n";
+        LogError("创建好友列表失败");
         send = "创建好友列表失败";
     }
 
     if(sql_create_group_list(connect, email.c_str()) == 0)
     {
-        std::cerr << "fail to create group table\n";
+        LogError("创建群组列表失败");
         send = "创建群组列表失败";
     }
 
@@ -478,11 +478,6 @@ void ServerhandleRegister(char* msg, int client_socket, MYSQL* connect)
 
 void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 {
-    std::cout << "new user want to login: " << client_socket << '\n'; 
-
-    std::cout << msg << '\n';
-
-
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
 
     std::string send;
@@ -490,22 +485,27 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
     std::string email = j["email"];
     std::string password = j["passwd"];
 
+    LogInfo("{}用户想要登陆", email);
+
     int ret = sql_online(connect, email.c_str());
 
     if(ret == 3)
     {
+        LogInfo("由于{}已经登录, 登录失败", email);
         send = "账号已登录, 请先退出登录";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
     else if(ret == 2)
     {
+        LogInfo("{}账号不存在", email);
         send = "账号不存在";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
     else if(ret == 0)
     {
+        LogError("数据库错误");
         send = "数据库错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
@@ -514,9 +514,13 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
     bool find = sql_select(connect, email.c_str(), password.c_str());
 
     if(find)
+    {
+        LogInfo("{}用户登录成功", email);
         send = "登录成功";
+    }
     else 
-    { 
+    {
+        LogInfo("{}用户登录失败, 密码错误", email);
         send = "登录失败，密码错误";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
@@ -524,7 +528,7 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 
     if(update_online_status(connect, email.c_str(), 1) == 0)
     {
-        std::cerr << "修改在线状态失败\n";
+        LogError("修改在线状态失败");
         send = "修改在线状态失败";
     }
 
@@ -539,7 +543,7 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
     std::string friend_list;
     if(sql_display_friend(connect, email.c_str(), friend_list) == 0)
     {
-        std::cerr << "fail to get friend list\n";
+        LogError("获取好友列表失败");
         return;
     }
 
@@ -555,28 +559,31 @@ void ServerhandleLogin(char* msg, int client_socket, MYSQL* connect)
 
 void ServerhandleForgetPasswd(char* msg, int client_socket, MYSQL* connect)
 {
-    std::cout << "new user want to change password: " << client_socket << '\n'; 
-
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string email = j["email"];
     std::string password = j["passwd"];
+
+    LogInfo("{}用户想要修改密码", email);
 
     std::string send;
 
     if(sql_online(connect, email.c_str()) == 0)
     {
-        send = "账号已登录";
+        LogInfo("{}用户正在登录, 无法修改密码", email);
+        send = "用户正在登录, 无法修改密码";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
     if(update_passwd(connect, email.c_str(), password.c_str()) == 0)
     {
+        LogError("{}用户密码更新失败", email);
         send = "密码更新失败";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
+    LogInfo("{}用户密码更新成功", email);
     send = "密码更新成功";
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 
@@ -667,6 +674,12 @@ void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
     else if(ret == 0)
     {
         send = "添加好友失败, 数据库错误";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+    else if(ret == 3)
+    {
+        send = "添加好友失败, 不能添加自己为好友";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
@@ -797,12 +810,12 @@ void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect)
 
 void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
 {
-    std::string email = hashTable[client_socket];
+    std::string from_email = hashTable[client_socket];
 
     std::cout << "user want to send private message: " << client_socket << '\n'; 
     std::cout << msg << '\n';
 
-    char* friend_email = msg;
+    char* to_email = msg;
 
     while(*msg != ' ' && *msg != '\0')
         msg++;
@@ -817,7 +830,7 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
     std::string time = dt;
     time.pop_back();
 
-    std::string send = sql_getname(connect, email.c_str()) + ": ("+ time + ")\n" + message + "\n";
+    std::string send = sql_getname(connect, from_email.c_str()) + ": ("+ time + ")\n" + message + "\n";
 
     /*
 
@@ -837,46 +850,63 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
 
     */
 
-    std::string emailStr = std::string(friend_email);
-    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+    std::string to_emailStr = std::string(to_email);
+    std::replace(to_emailStr.begin(), to_emailStr.end(), '@', '0');
 
-    std::string::size_type pos = emailStr.find('.');
+    std::string::size_type pos = to_emailStr.find('.');
     if (pos != std::string::npos) 
     {
-        emailStr = emailStr.substr(0, pos) + "_list";
+        to_emailStr = to_emailStr.substr(0, pos) + "_list";
     }
 
-    std::cout << "emailStr: " << emailStr << '\n';
+    std::string from_emailStr = std::string(from_email);
+    std::replace(from_emailStr.begin(), from_emailStr.end(), '@', '0');
 
-    std::string type = getTypeByEmail(connect, emailStr, email);
+    std::string::size_type pos2 = from_emailStr.find('.');
+    if (pos2 != std::string::npos) 
+    {
+        from_emailStr = from_emailStr.substr(0, pos2) + "_list";
+    }
+
+    std::cout << "emailStr: " << to_emailStr << '\n';
+
+    std::string type = getTypeByEmail(connect, to_emailStr, from_email);
 
     if(type == "request")
     { 
-        send = "您不是" + std::string(friend_email) + "好友";
+        send = "您不是" + std::string(to_email) + "好友";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
     if(type == "block")
     {
-        send = "您已被" + std::string(friend_email) + "屏蔽";
+        send = "您已被" + std::string(to_email) + "屏蔽";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
+    std::string type2 = getTypeByEmail(connect, from_emailStr, to_email);
 
-    add_friend_message_list(connect, email.c_str(), friend_email, message);
-
-    if(sql_if_online(connect, friend_email) == 0)
+    if(type2 == "block")
     {
-        send = std::string(friend_email) + "不在线";
+        send = "您已屏蔽" + std::string(to_email);
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    add_friend_message_list(connect, from_email.c_str(), to_email, message);
+
+    if(sql_if_online(connect, to_email) == 0)
+    {
+        send = std::string(to_email) + "不在线";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
     }
 
     for(const auto& socket : hashTable)
     {
-        if(socket.second == friend_email)
+        if(socket.second == to_email)
         {
             sendMsg(socket.first, send.c_str(), send.size(), PRIVATE_MESSAGE);
             break;
@@ -1171,6 +1201,13 @@ void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect)
     std::string email = j["email"];
 
     std::string send;
+
+    if(my_email == email)
+    {
+        send = "你不能踢自己";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
 
     if(if_group_exist(connect, group_name.c_str()) == 1)
     {
@@ -1483,6 +1520,18 @@ void ServerhandleGroupHistory(char* msg, int client_socket, MYSQL* connect)
     std::string send;
 
     int ret = sql_group_history(connect, email.c_str(), group_name, send);
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
+void ServerhandleHeartBeat(char* msg, int client_socket)
+{
+    std::string email = hashTable[client_socket];
+
+    std::cout << "user want to send heart beat: " << client_socket << '\n'; 
+    std::cout << msg << '\n';
+
+    std::string send = "心跳包";
 
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }

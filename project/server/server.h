@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include "../mysql/mysql.h"
 #include "../threadpool/threadpool.h"
+#include "../log/mars_logger.h"
 
 #define MAX_EVENTS 1024
 

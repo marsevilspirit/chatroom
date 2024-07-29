@@ -1,3 +1,6 @@
+#ifndef MESSAGE_H
+#define MESSAGE_H
+
 #include <string>
 #include <iostream>
 #include <unistd.h>
@@ -11,6 +14,7 @@
 #include <sstream>
 #include "../mysql/mysql.h"
 #include "../json.hpp"
+#include "../log/mars_logger.h"
 
 enum Type{
     LOGIN = 1,
@@ -43,6 +47,7 @@ enum Type{
     CHECK_FILE,
     FRIEND_HISTORY,
     GROUP_HISTORY,
+    HEART_BEAT,
 };
 
 int sendMsg(int cfd, const char* msg, int len, Type flag);
@@ -116,3 +121,7 @@ void ServerhandleReceiveFile(char* msg, int client_socket, MYSQL* connect);
 void ServerhandleFriendHistory(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandleGroupHistory(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleHeartBeat(char* msg, int client_socket);
+
+#endif // MESSAGE_H

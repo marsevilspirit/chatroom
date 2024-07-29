@@ -585,8 +585,14 @@ bool is_my_friend(MYSQL* connect, const char* email, const char* friend_email)
     return true; // 是好友
 }
 
-int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)//1成功，0数据库错误, 2用户不存在
+int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)//1成功，0数据库错误, 2用户不存在,3不能加自己
 {
+    if(email == friend_email)
+    {
+        std::cerr << "Error: You can't add yourself as a friend\n";
+        return 3;
+    }
+
     //替换@符号
     std::string emailStr = std::string(email);
     std::replace(emailStr.begin(), emailStr.end(), '@', '0');

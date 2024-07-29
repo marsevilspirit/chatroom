@@ -1,3 +1,6 @@
+#ifndef MYSQL_H
+#define MYSQL_H
+
 #include <mysql/mysql.h>
 #include <iostream>
 #include <algorithm>
@@ -108,3 +111,5 @@ int add_friend_message_list(MYSQL* connect, const char* email, const char* frien
 int add_group_message_list(MYSQL* connect, const char* email, const char* group_name, const char* message);
 
 int sql_group_history(MYSQL* connect, const char* email, const char* group_name, std::string& send);
+
+#endif // MYSQL_H

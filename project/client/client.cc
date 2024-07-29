@@ -109,10 +109,27 @@ void receiveMessageThread(int sfd)
             break;
         }
 
-        std::lock_guard<std::mutex> lock(mtx); // 使用互斥量保护标准输出
-        std::cout << msg << '\n';
+        if (flag == SEND_FILE || flag == SEND_FILE_LONG)
+        {
+            continue;
+        }
+
+        {
+            std::lock_guard<std::mutex> lock(mtx); // 使用互斥量保护标准输出
+            std::cout << msg << '\n';
+        }
 
         std::cout << '\n';
+    }
+}
+
+void sendHeartbeatThread(int sfd) 
+{
+    while (true) 
+    {
+        std::string msg = "heartbeat";
+        usleep(1000000); // 暂停1秒
+        sendMsg(sfd, msg.c_str(), msg.length(), HEART_BEAT);
     }
 }
 
@@ -143,10 +160,13 @@ int main(void)
     std::thread sendThread(sendMessageThread, sfd);
     // 创建接收消息线程
     std::thread receiveThread(receiveMessageThread, sfd);
+    // 创建发送心跳包线程
+    //std::thread heartbeatThread(sendHeartbeatThread, sfd);
 
     // 等待发送消息线程和接收消息线程结束
     sendThread.join();
     receiveThread.join();
+    //heartbeatThread.join();
 
     if (close(sfd) == 0) 
     {

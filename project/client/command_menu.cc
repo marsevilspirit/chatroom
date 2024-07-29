@@ -1,5 +1,6 @@
 #include "command_menu.h"
 #include "../message/message.h"
+#include <unistd.h>
 
 static void clearInputBuffer() 
 {
@@ -156,11 +157,27 @@ static void display_list_group(int sfd)
 
 static void display_request_list(int sfd)
 {
-    std::string send;
+    std::string group_name, email;
     std::cout << "请输入群聊名称：";
-    std::cin >> send;
+    std::cin >> group_name;
 
-    sendMsg(sfd, send.c_str(), send.size(), DISPLAY_GROUP_REQUEST);
+    sendMsg(sfd, group_name.c_str(), group_name.size(), DISPLAY_GROUP_REQUEST);
+
+    usleep(10000);
+
+    while(true)
+    {
+        std::cout << "输入拉入群聊的邮箱(exit退出): ";
+        std::cin >> email;
+
+        if(email == "exit")
+        {
+            break;
+        }
+
+        std::string send = "{\"group_name\": \"" + group_name + "\", \"email\": \"" + email+ "\"}";
+        sendMsg(sfd, send.c_str(), send.size(), ADD_GROUP);
+    }
 }
 
 static void set_manager(int sfd)
@@ -178,6 +195,7 @@ static void set_manager(int sfd)
     sendMsg(sfd, send.c_str(), send.size(), SET_MANAGER);
 }
 
+/*
 static void add_people_in_group(int sfd)
 {
     std::string group_name;
@@ -191,6 +209,7 @@ static void add_people_in_group(int sfd)
 
     sendMsg(sfd, send.c_str(), send.size(), ADD_GROUP);
 }
+*/
 
 static void cancel_manager(int sfd)
 {
@@ -241,7 +260,7 @@ static void group_menu(int sfd)
         std::cout << "e.群聊列表    f.设置管理员\n";
         std::cout << "g.取消管理员  i.踢人\n";
         std::cout << "j.群聊成员    k.申请列表\n";
-        std::cout << "l.拉人进群    m.退出\n";
+        std::cout << "m.退出\n";
 
         char command;
         std::cin >> command;
@@ -259,7 +278,6 @@ static void group_menu(int sfd)
             case 'i':    kick_somebody(sfd);        break;
             case 'j':    display_group_member(sfd); break;
             case 'k':    display_request_list(sfd); break;
-            case 'l':    add_people_in_group(sfd);  break;
             case 'm':    std::cout << "退出群操作界面\n";         return;
         }
     }
@@ -334,9 +352,14 @@ void receive_file(int sfd)
     std::cout << "请输入文件存储路径(包括文件名): ";
     std::cin >> file_path;
 
+    clearInputBuffer();
+
     std::string send = friend_email + " " + file_name + " " + file_path;
 
     sendMsg(sfd, send.c_str(), send.size(), RECEIVE_FILE);
+
+    std::cout << "文件传输中,请稍等...\n";
+    std::cout << "传输完毕后,服务器会通知\n";
 }
 
 void check_file(int sfd)

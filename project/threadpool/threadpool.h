@@ -1,3 +1,6 @@
+#ifndef THREADPOOL_H
+#define THREADPOOL_H
+
 #include <thread>
 #include <functional>
 #include <mutex>
@@ -33,4 +36,4 @@ private:
     std::mutex queue_mutex{};
 };
 
-
+#endif // THREADPOOL_H

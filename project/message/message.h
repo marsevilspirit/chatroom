@@ -27,6 +27,7 @@ enum Type{
     SERVER_MESSAGE,
     BLOCK_FRIEND,
     DISPLAY_FRIEND,
+    DISPLAY_FRIEND_REQUEST,
     UNBLOCK_FRIEND,
     PRIVATE_MESSAGE,
     CREATE_GROUP,
@@ -83,6 +84,8 @@ void ServerhandleBlockFriend(char* msg, int client_socket, MYSQL* connect);
 void ServerhandleUnblockFriend(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect);
+
+void ServerhandleDisplayFriendRequest(char* msg, int client_socket, MYSQL* connect);
 
 void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect);
 

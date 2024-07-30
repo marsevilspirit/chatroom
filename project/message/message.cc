@@ -805,6 +805,24 @@ void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect)
     sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
 }
 
+void ServerhandleDisplayFriendRequest(char* msg, int client_socket, MYSQL* connect)
+{
+    std::string email = hashTable[client_socket];
+
+    LogInfo("用户{}想要查看好友请求列表", email);
+
+    std::string send;
+
+    if(sql_display_friend_request(connect, email.c_str(), send) == 0)
+    {
+        send = "获取好友请求列表失败";
+        sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+        return;
+    }
+
+    sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
+}
+
 void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
 {
     std::string from_email = hashTable[client_socket];

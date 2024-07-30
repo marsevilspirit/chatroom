@@ -859,6 +859,44 @@ int sql_display_friend(MYSQL* connect, const char* email, std::string& send)
     return 1;
 }
 
+int sql_display_friend_request(MYSQL* connect, const char* email, std::string& send)
+{
+    //替换@符号
+    std::string emailStr = std::string(email);
+    std::replace(emailStr.begin(), emailStr.end(), '@', '0');
+
+    //去除.之后的内容
+    std::string::size_type pos = emailStr.find('.');
+    if (pos != std::string::npos) 
+    {
+        emailStr = emailStr.substr(0, pos);
+    }
+
+    std::string query = "SELECT email FROM " + emailStr + "_list WHERE type = 'request'";
+
+    if (mysql_query(connect, query.c_str())) 
+    {
+        LogError("Error displaying friend request: {}", mysql_error(connect));
+        return 0;
+    }
+
+    MYSQL_RES* result = mysql_store_result(connect);
+    if (result == nullptr) 
+    {
+        LogError("Error storing result: {}", mysql_error(connect));
+        return 0;
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result))) 
+    {
+        send += std::string(row[0]) + '\n';
+    }
+
+    mysql_free_result(result);
+    return 1;
+}
+
 //file
 int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, const char* sender, const char* resver)//firend 1, not friend 2, database error 0
 {

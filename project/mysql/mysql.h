@@ -55,6 +55,8 @@ int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_ema
 
 int sql_display_friend(MYSQL* connect, const char* email, std::string& send);
 
+int sql_display_friend_request(MYSQL* connect, const char* email, std::string& send);
+
 std::string getTypeByEmail(MYSQL* connect, const std::string& list, const std::string& email);
 
 //--------------------------------------------------------------------------------

@@ -159,6 +159,7 @@ void server::handleReceivedMessage(int client_socket)
                 case BLOCK_FRIEND:          threadPool.enqueue(ServerhandleBlockFriend, msg, client_socket, connect);            break;
                 case UNBLOCK_FRIEND:        threadPool.enqueue(ServerhandleUnblockFriend, msg, client_socket, connect);          break;
                 case DISPLAY_FRIEND:        threadPool.enqueue(ServerhandleDisplayFriend, msg, client_socket, connect);          break;
+                case DISPLAY_FRIEND_REQUEST:threadPool.enqueue(ServerhandleDisplayFriendRequest, msg, client_socket, connect);   break;
                 case PRIVATE_MESSAGE:       ServerhandlePrivateMessage(msg, client_socket, connect);                             break;
                 case CREATE_GROUP:          threadPool.enqueue(ServerhandleCreateGroup, msg, client_socket, connect);            break;
                 case DELETE_GROUP:          threadPool.enqueue(ServerhandleDeleteGroup, msg, client_socket, connect);            break;

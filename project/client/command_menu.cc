@@ -51,13 +51,37 @@ static void display_friend(int sfd)
     sendMsg(sfd, msg.c_str(), msg.size(), DISPLAY_FRIEND);
 }
 
+static void friend_request_list(int sfd)
+{
+    std::string msg = "request_list";
+    sendMsg(sfd, msg.c_str(), msg.size(), DISPLAY_FRIEND_REQUEST);
+
+    usleep(10000);
+
+    while(true)
+    {
+        std::string email;
+        std::cout << "输入同意的邮箱(exit退出): ";
+        std::cin >> email;
+
+        if(email == "exit")
+        {
+            break;
+        }
+
+        std::string send = email;
+        sendMsg(sfd, send.c_str(), send.size(), ADD_FRIEND);
+    }
+}
+
 static void friend_menu(int sfd) 
 {
     while(true)
     {
         std::cout << "1.添加好友 2.删除好友\n";
         std::cout << "3.屏蔽好友 4.解除屏蔽\n";
-        std::cout << "5.好友列表 6.返回\n";
+        std::cout << "5.好友列表 6.申请列表\n";
+        std::cout << "7.退出\n";
 
         char command;
         std::cin >> command;
@@ -70,7 +94,8 @@ static void friend_menu(int sfd)
             case '3':     block_friend(sfd);                        break;
             case '4':     unblock_friend(sfd);                      break;
             case '5':     display_friend(sfd);                      break;
-            case '6':     std::cout << "退出好友操作界面\n";        return;
+            case '6':     friend_request_list(sfd);                 break;
+            case '7':     std::cout << "退出好友操作界面\n";        return;
         }
     }
 }

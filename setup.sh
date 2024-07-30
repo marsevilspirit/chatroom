@@ -14,3 +14,5 @@ cd build
 cmake ..
 
 make
+
+mkdir server_file # create a directory to store server files

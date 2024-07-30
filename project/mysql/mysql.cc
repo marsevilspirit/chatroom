@@ -1,5 +1,4 @@
 #include "mysql.h"
-#include <mysql/mysql.h>
 
 MYSQL* sql_init(MYSQL* connect)
 {
@@ -94,7 +93,7 @@ int sql_insert(MYSQL* connect, const char* email, const char* password, const ch
     // 执行 SQL 语句
     if (mysql_query(connect, sql_query.c_str())) 
     {
-        std::cerr << "Error inserting data into table: " << mysql_error(connect) << '\n';
+        LogError("向表中插入数据失败: {}", mysql_error(connect));
 
         return 0;
     }
@@ -110,7 +109,7 @@ int sql_select(MYSQL* connect, const char* email, const char* password)
     // 执行 SQL 查询
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+        LogError("查询数据库失败: {}", mysql_error(connect));
         return 0; // 查询失败
     }
 
@@ -118,7 +117,7 @@ int sql_select(MYSQL* connect, const char* email, const char* password)
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("获取查询结果失败: {}", mysql_error(connect));
         return 0; // 获取结果失败
     }
 
@@ -139,14 +138,14 @@ std::string getTypeByEmail(MYSQL* connect, const std::string& list, const std::s
 
     // 执行查询
     if (mysql_query(connect, query.c_str())) {
-        std::cerr << "MySQL query error: " << mysql_error(connect) << std::endl;
+        LogError("MySQL query error: {}", mysql_error(connect));
         return "";
     }
 
     // 获取查询结果
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) {
-        std::cerr << "MySQL store result error: " << mysql_error(connect) << std::endl;
+        LogError("MySQL store result error: {}", mysql_error(connect));
         return "";
     }
 
@@ -157,7 +156,7 @@ std::string getTypeByEmail(MYSQL* connect, const std::string& list, const std::s
     if (row) {
         type = row[0];
     } else {
-        std::cerr << "No result found for email: " << email << std::endl;
+        LogError( "No result found for email: {}", email);
         type = "";
     }
 
@@ -173,14 +172,14 @@ int if_exist(MYSQL* connect, const char* email)// 1存在，0不存在
 
     if (mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+        LogError("查询数据库失败: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr)
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -193,7 +192,7 @@ int sql_online(MYSQL* connect, const char* email)// 1成功，0数据库错误, 
 {
     if(if_exist(connect, email) == 0)//用户不存在
     {
-        std::cerr << "Error: " << email << " does not exist\n";
+        LogError("Error: {} does not exist", email);
         return 2;
     }
 
@@ -201,14 +200,14 @@ int sql_online(MYSQL* connect, const char* email)// 1成功，0数据库错误, 
 
     if (mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+        LogError("Error querying database: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr)
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -223,14 +222,14 @@ int sql_if_online(MYSQL* connect, const char* email)
 
     if (mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error querying database(sql_if_online): " << mysql_error(connect) << '\n';
+        LogError("Error querying database: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr)
     {
-        std::cerr << "Error storing result(sql_if_online): " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -245,7 +244,7 @@ int update_online_status(MYSQL* connect, const char* email, int status)
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error updating online status: " << mysql_error(connect) << '\n';
+        LogError("Error updating online status: {}", mysql_error(connect));
         return 0;
     }
 
@@ -260,7 +259,7 @@ int update_passwd(MYSQL* connect, const char* email, const char* password)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error updating password: " << mysql_error(connect) << '\n';
+        LogError("Error updating password: {}", mysql_error(connect));
         return 0;
     }
 
@@ -272,7 +271,7 @@ int delete_account(MYSQL* connect, const char* email, const char* password)
     //检查 email 和 password 是否匹配
     if(sql_select(connect, email, password) == 0)
     {
-        std::cerr << "Error: " << email << " and " << password << " does not match\n";
+        LogError("Error: {} and {} does not match", email, password);
         return 0;
     }
 
@@ -280,7 +279,7 @@ int delete_account(MYSQL* connect, const char* email, const char* password)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error deleting account: " << mysql_error(connect) << '\n';
+        LogError("Error deleting account: {}", mysql_error(connect));
         return 0;
     }
 
@@ -293,13 +292,13 @@ std::string sql_getname(MYSQL* connect, const char* email)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error querying database(sql_getname): " << mysql_error(connect) << '\n';
+        LogError("Error querying database: {}", mysql_error(connect));
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if(result == nullptr)
     {
-        std::cerr << "Error storing result(sql_getname): " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
     }
 
     MYSQL_ROW row = mysql_fetch_row(result);
@@ -325,11 +324,11 @@ int sql_create_list(MYSQL* connect, const char* email)
             email VARCHAR(255) PRIMARY KEY,\
             type VARCHAR(255) NOT NULL)";
 
-    std::cout << "create list " << email << '\n';
+    LogInfo("create list {}", email);
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error creating list: " << mysql_error(connect) << '\n';
+        LogError("Error creating list: {}", mysql_error(connect));
         return 0;
     }
 
@@ -353,14 +352,14 @@ int handle_delete_friend(MYSQL* connect, const char* email)
     std::string query = "SELECT email FROM " + emailStr + "_list WHERE type = 'friend' OR type = 'request'";
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error querying database: " << mysql_error(connect) << '\n';
+        LogError("Error querying database: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -381,7 +380,7 @@ int handle_delete_friend(MYSQL* connect, const char* email)
         std::string query = "DELETE FROM " + friend_email + "_list WHERE email = '" + std::string(email) + "'";
         if (mysql_query(connect, query.c_str())) 
         {
-            std::cerr << "Error deleting friend: " << mysql_error(connect) << '\n';
+            LogError("Error deleting friend: {}", mysql_error(connect));
             return 0;
         }
     }
@@ -408,7 +407,7 @@ int sql_delete_list(MYSQL* connect, const char* email)
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error deleting list: " << mysql_error(connect) << '\n';
+        LogError("Error deleting list: {}", mysql_error(connect));
         return 0;
     }
 
@@ -430,14 +429,14 @@ bool is_your_friend_or_request(MYSQL* connect, const char* email, const char* fr
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error checking friend: " << mysql_error(connect) << '\n';
+        LogError("Error checking friend: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error retrieving result: " << mysql_error(connect) << '\n';
+        LogError("Error retrieving result: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
@@ -526,14 +525,14 @@ bool is_my_friend_or_request(MYSQL* connect, const char* email, const char* frie
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error checking friend: " << mysql_error(connect) << '\n';
+        LogError("Error checking friend: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error retrieving result: " << mysql_error(connect) << '\n';
+        LogError("Error retrieving result: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
@@ -563,14 +562,14 @@ bool is_my_friend(MYSQL* connect, const char* email, const char* friend_email)
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error checking friend: " << mysql_error(connect) << '\n';
+        LogError("Error checking friend: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error retrieving result: " << mysql_error(connect) << '\n';
+        LogError("Error retrieving result: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
@@ -589,7 +588,7 @@ int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)/
 {
     if(email == friend_email)
     {
-        std::cerr << "Error: You can't add yourself as a friend\n";
+        LogError("Error: You can't add yourself as a friend\n");
         return 3;
     }
 
@@ -606,7 +605,7 @@ int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)/
 
     if(if_exist(connect, friend_email) == 0)
     {
-        std::cerr << "Error: " << friend_email << " does not exist\n";
+        LogError("Error: {} does not exist", friend_email);
         return 2;
     }
 
@@ -618,7 +617,7 @@ int sql_add_friend(MYSQL* connect, const char* email, const char* friend_email)/
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error adding friend: " << mysql_error(connect) << '\n';
+        LogError("Error adding friend: {}", mysql_error(connect));
         return 0;
     }
 
@@ -642,6 +641,7 @@ int sql_request(MYSQL* connect,const char* email,const char* friend_email)
     if (mysql_query(connect, query.c_str())) 
     {
         std::cerr << "Error requesting friend: " << mysql_error(connect) << '\n';
+        LogError("Error requesting friend: {}", mysql_error(connect));
         return 0;
     }
 
@@ -652,7 +652,7 @@ int sql_delete_friend(MYSQL* connect, const char* email, const char* friend_emai
 {
     if (!is_my_friend(connect, email, friend_email)) 
     {
-        std::cerr << "Error: " << friend_email << " is not your friend\n";
+        LogError("Error: {} is not your friend", friend_email);
         return 2;
     }
 
@@ -671,7 +671,7 @@ int sql_delete_friend(MYSQL* connect, const char* email, const char* friend_emai
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error deleting friend: " << mysql_error(connect) << '\n';
+        LogError("Error deleting friend: {}", mysql_error(connect));
         return 0;
     }
 
@@ -693,14 +693,14 @@ bool is_my_block(MYSQL* connect, const char* email, const char* friend_email)
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error checking friend: " << mysql_error(connect) << '\n';
+        LogError("Error checking friend: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error retrieving result: " << mysql_error(connect) << '\n';
+        LogError("Error retrieving result: {}", mysql_error(connect));
         return false; // 默认不是好友
     }
 
@@ -719,7 +719,7 @@ int sql_block_friend(MYSQL* connect, const char* email, const char* friend_email
 {
     if (!is_my_friend(connect, email, friend_email)) 
     {
-        std::cerr << "Error: " << friend_email << " is not your friend\n";
+        LogError("Error: {} is not your friend", friend_email);
         return 2;
     }
 
@@ -738,7 +738,7 @@ int sql_block_friend(MYSQL* connect, const char* email, const char* friend_email
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error blocking friend: " << mysql_error(connect) << '\n';
+        LogError("Error blocking friend: {}", mysql_error(connect));
         return 0;
     }
 
@@ -760,14 +760,14 @@ int sql_if_block(MYSQL* connect, const char* email, const char* friend_email)
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error executing SQL query: " << mysql_error(connect) << '\n';
+        LogError("Error executing SQL query: {}", mysql_error(connect));
         return 0; // 查询执行失败，返回 0
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error retrieving result: " << mysql_error(connect) << '\n';
+        LogError("Error retrieving result: {}", mysql_error(connect));
         return 0; // 获取结果失败，返回 0
     }
 
@@ -786,7 +786,7 @@ int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_ema
 {
     if (!is_my_block(connect, email, friend_email)) 
     {
-        std::cerr << "Error: " << friend_email << " is not your block\n";
+        LogError("Error: {} is not your block", friend_email);
         return 2;
     }
 
@@ -805,7 +805,7 @@ int sql_unblock_friend(MYSQL* connect, const char* email, const char* friend_ema
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error unblocking friend: " << mysql_error(connect) << '\n';
+        LogError("Error unblocking friend: {}", mysql_error(connect));
         return 0;
     }
 
@@ -829,14 +829,14 @@ int sql_display_friend(MYSQL* connect, const char* email, std::string& send)
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error displaying friend: " << mysql_error(connect) << '\n';
+        LogError("Error displaying friend: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -870,7 +870,7 @@ int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, c
 
         if (mysql_query(connect, query.c_str())) 
         {
-            std::cerr << "Error checking file: " << mysql_error(connect) << '\n';
+            LogError("Error checking file: {}", mysql_error(connect));
             return 0;
         }
 
@@ -878,7 +878,7 @@ int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, c
 
         if (result == nullptr) 
         {
-            std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+            LogError("Error storing result: {}", mysql_error(connect));
             return 0;
         }
 
@@ -897,7 +897,7 @@ int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, c
 
             if (mysql_query(connect, query.c_str())) 
             {
-                std::cerr << "Error inserting file: " << mysql_error(connect) << '\n';
+                LogError( "Error inserting file: {}", mysql_error(connect));
                 return 0;
             }
         }
@@ -907,7 +907,7 @@ int sql_file_list(MYSQL* connect, const char* file_name, const char* savePath, c
 
             if (mysql_query(connect, query.c_str())) 
             {
-                std::cerr << "Error updating file: " << mysql_error(connect) << '\n';
+                LogError("Error updating file: {}", mysql_error(connect));
                 return 0;
             }
         }
@@ -923,14 +923,14 @@ int sql_check_file(MYSQL* connect, const char* email, std::string& send)
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error checking file: " << mysql_error(connect) << '\n';
+        LogError("Error checking file: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) 
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -952,7 +952,7 @@ int sql_receive_file(MYSQL* connect, const char* email, const char* sender, cons
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error receiving file: " << mysql_error(connect) << '\n';
+        LogError("Error receiving file: {}", mysql_error(connect));
         return 0;
     }
 
@@ -960,7 +960,7 @@ int sql_receive_file(MYSQL* connect, const char* email, const char* sender, cons
 
     if (result == nullptr) 
     {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -974,7 +974,7 @@ int sql_receive_file(MYSQL* connect, const char* email, const char* sender, cons
 
     file_path = row[0];
 
-    std::cout << "path" << file_path << '\n';
+    LogTrace("path: {}", file_path);
 
     mysql_free_result(result);
 
@@ -994,7 +994,7 @@ int sql_receive_file(MYSQL* connect, const char* email, const char* sender, cons
 
 int sql_friend_history(MYSQL* connect, const char* email, const char* friend_email, std::string& send) {
     if (!is_my_friend(connect, email, friend_email)) {
-        std::cerr << "Error: " << friend_email << " is not your friend\n";
+        LogError("Error: {} is not your friend", friend_email);
         return 2;
     }
 
@@ -1002,13 +1002,13 @@ int sql_friend_history(MYSQL* connect, const char* email, const char* friend_ema
         
 
     if (mysql_query(connect, query.c_str())) {
-        std::cerr << "Error checking friend history: " << mysql_error(connect) << '\n';
+        LogError("Error checking friend history: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 
@@ -1027,7 +1027,7 @@ int add_friend_message_list(MYSQL* connect, const char* email, const char* frien
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error inserting friend history: " << mysql_error(connect) << '\n';
+        LogError("Error inserting friend history: {}", mysql_error(connect));
         return 0;
     }
 
@@ -1040,7 +1040,7 @@ int add_group_message_list(MYSQL* connect, const char* email, const char* group_
 
     if (mysql_query(connect, query.c_str())) 
     {
-        std::cerr << "Error inserting group history: " << mysql_error(connect) << '\n';
+        LogError("Error inserting group history: {}", mysql_error(connect));
         return 0;
     }
 
@@ -1066,13 +1066,13 @@ int sql_group_history(MYSQL* connect, const char* email, const char* group_name,
     std::cout << query << '\n';
 
     if (mysql_query(connect, query.c_str())) {
-        std::cerr << "Error checking group history: " << mysql_error(connect) << '\n';
+        LogError("Error checking group history: {}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if (result == nullptr) {
-        std::cerr << "Error storing result: " << mysql_error(connect) << '\n';
+        LogError("Error storing result: {}", mysql_error(connect));
         return 0;
     }
 

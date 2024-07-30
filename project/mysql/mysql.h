@@ -5,7 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cstring>
-
+#include "../log/mars_logger.h"
 
 MYSQL* sql_init(MYSQL* connect);
 

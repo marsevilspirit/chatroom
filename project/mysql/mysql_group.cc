@@ -17,7 +17,7 @@ int sql_create_group_list(MYSQL* connect, const char* email)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
     return 1;
@@ -38,11 +38,11 @@ int sql_delete_group_list(MYSQL* connect, const char* email)
 
     std::string query = "DROP TABLE " + emailStr + "_group;";
 
-    std::cout << query << '\n';
+    LogTrace("{}", query);
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
     return 1;
@@ -54,14 +54,14 @@ int if_group_exist(MYSQL* connect, const char* group_name)//0代表存在，1代
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
     MYSQL_RES* result = mysql_store_result(connect);
     if(result && mysql_num_rows(result) > 0)
     {
-        std::cerr << "Group name  exists." << std::endl;
+        LogError("Group name exists.");
         mysql_free_result(result);
         return 0;
     }
@@ -85,47 +85,47 @@ int sql_create_group(MYSQL* connect, const char* email, const char* group_name)
 
     if(if_group_exist(connect, group_name) == 0)
     {
-        std::cout << "群组已存在\n";
+        LogInfo("Group name exists.");
         return 0;
     }
 
     std::string query = "INSERT INTO group_list (group_name) VALUES ('" + std::string(group_name) + "');";
 
-    std::cout << query << '\n';
+    LogTrace("{}", query);
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("Error: {}", mysql_error(connect));
         return 0;
     }
 
     query = "INSERT INTO " + emailStr + "_group (group_name, status) VALUES ('" + std::string(group_name) + "', 'master');";
 
-    std::cout << query << '\n';
+    LogTrace("{}", query);
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
     query = "CREATE TABLE IF NOT EXISTS " + std::string(group_name) + "_group (email VARCHAR(255) NOT NULL, status VARCHAR(255) NOT NULL);";
 
-    std::cout << query << '\n';
+    LogTrace("{}", query);
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
     query = "INSERT INTO " + std::string(group_name) + "_group (email, status) VALUES ('" + std::string(email) + "', 'master');";
 
-    std::cout << query << '\n';
+    LogTrace("{}", query);
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -149,7 +149,7 @@ int if_master(MYSQL* connect, const char* email, const char* group_name)//0代�
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -181,7 +181,7 @@ int if_member(MYSQL* connect, const char* email, const char* group_name)//1有�
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -211,13 +211,13 @@ int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)/
 
     if(if_group_exist(connect, group_name) == 1)
     {
-        std::cout << "群组不存在(DELETE)\n";
+        LogError("Group name does not exist.");
         return 0;
     }
 
     if(if_master(connect, email, group_name) == 0)
     {
-        std::cout << "您不是群主\n";
+        LogError("You are not the master of this group.");
         return 0;
     }
 
@@ -225,7 +225,7 @@ int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)/
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -233,7 +233,7 @@ int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)/
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -242,7 +242,7 @@ int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)/
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -265,7 +265,7 @@ int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)/
         query = "DELETE FROM " + std::string(emailStr) + "_group WHERE group_name = '" + std::string(group_name) + "';";
         if(mysql_query(connect, query.c_str()))
         {
-            std::cerr << "Error: " << mysql_error(connect) << std::endl;
+            LogError("{}", mysql_error(connect));
             return 0;
         }
     }
@@ -276,7 +276,7 @@ int sql_delete_group(MYSQL* connect, const char* email, const char* group_name)/
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -298,7 +298,7 @@ int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name)/
 
     if(if_group_exist(connect, group_name) == 1)
     {
-        std::cout << "群组不存在\n";
+        LogInfo("Group name does not exist.");
         return 2;
     }
 
@@ -307,7 +307,7 @@ int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name)/
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -315,7 +315,7 @@ int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name)/
 
     if(result && mysql_num_rows(result) > 0)
     {
-        std::cerr << "You are already a member of this group." << std::endl;
+        LogError("You are already a member of this group.");
         mysql_free_result(result);
         return 3;
     }
@@ -323,21 +323,21 @@ int sql_add_group(MYSQL* connect, const char* my_email, const char* group_name)/
 
     query = "INSERT INTO " + my_emailStr + "_group (group_name, status) VALUES ('" + std::string(group_name) + "', 'request');";
 
-    std::cout << query << '\n';
+    LogTrace("{}", query);
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
     query = "INSERT INTO " + std::string(group_name) + "_group (email, status) VALUES ('" + std::string(my_email) + "', 'request');";
 
-    std::cout << query << '\n';
+    LogTrace("{}", query);
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -362,7 +362,7 @@ int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -374,7 +374,7 @@ int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name)
     }
     else
     {
-        std::cerr << "You are not a member of this group." << std::endl;
+        LogError("You are not a member of this group.");
         mysql_free_result(result);
         return 2;
     }
@@ -384,7 +384,7 @@ int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -392,7 +392,7 @@ int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name)
 
     if(result && mysql_num_rows(result) > 0)
     {
-        std::cerr << "You are master of this group." << std::endl;
+        LogError("You are master of this group.");
         mysql_free_result(result);
         return 3;
     }
@@ -405,7 +405,7 @@ int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -413,7 +413,7 @@ int sql_exit_group(MYSQL* connect, const char* my_email, const char* group_name)
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -426,7 +426,7 @@ int sql_display_group(MYSQL* connect, std::string& send) //1成功，0数据库�
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -461,7 +461,7 @@ int if_master_or_manager(MYSQL* connect, const char* email, const char* group_na
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -480,7 +480,7 @@ int sql_display_request_list(MYSQL* connect, const char* my_email, const char* g
 {
     if(if_master_or_manager(connect, my_email, group_name) == 0)
     {
-        std::cout << "您不是群主或管理员\n";
+        LogInfo("You are not the master or manager of this group.");
         return 2;
     }
 
@@ -488,7 +488,7 @@ int sql_display_request_list(MYSQL* connect, const char* my_email, const char* g
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -510,7 +510,7 @@ int sql_set_manager(MYSQL* connect, const char* my_email, const char* email, con
 {
     if(if_master(connect, my_email, group_name) == 0)
     {
-        std::cout << "user is not master\n";
+        LogInfo("您不是群主");
         return 0;
     }
 
@@ -519,7 +519,7 @@ int sql_set_manager(MYSQL* connect, const char* my_email, const char* email, con
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -531,7 +531,7 @@ int sql_set_manager(MYSQL* connect, const char* my_email, const char* email, con
     }
     else
     {
-        std::cerr << "This user is not a member of this group." << std::endl;
+        LogError("This user is not a member of this group.");
         mysql_free_result(result);
         return 2;
     }
@@ -551,7 +551,7 @@ int sql_set_manager(MYSQL* connect, const char* my_email, const char* email, con
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -559,7 +559,7 @@ int sql_set_manager(MYSQL* connect, const char* my_email, const char* email, con
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -570,7 +570,7 @@ int sql_real_add_group(MYSQL* connect, const char* my_email, const char* email, 
 {
     if(if_master_or_manager(connect, my_email, group_name) == 0)
     {
-        std::cout << "您不是群主或管理员\n";
+        LogInfo("You are not the master or manager of this group.");
         return 2;
     }
 
@@ -579,7 +579,7 @@ int sql_real_add_group(MYSQL* connect, const char* my_email, const char* email, 
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -591,7 +591,7 @@ int sql_real_add_group(MYSQL* connect, const char* my_email, const char* email, 
     }
     else
     {
-        std::cerr << "This user is not a member of this group." << std::endl;
+        LogError("This user is not a request member of this group.");
         mysql_free_result(result);
         return 3;
     }
@@ -612,7 +612,7 @@ int sql_real_add_group(MYSQL* connect, const char* my_email, const char* email, 
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -621,7 +621,7 @@ int sql_real_add_group(MYSQL* connect, const char* my_email, const char* email, 
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -632,7 +632,7 @@ int sql_cancel_manager(MYSQL* connect, const char* my_email, const char* email, 
 {
     if(if_master(connect, my_email, group_name) == 0)
     {
-        std::cout << "您不是群主\n";
+        LogInfo("您不是群主");
         return 2;
     }
 
@@ -641,7 +641,7 @@ int sql_cancel_manager(MYSQL* connect, const char* my_email, const char* email, 
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -653,7 +653,7 @@ int sql_cancel_manager(MYSQL* connect, const char* my_email, const char* email, 
     }
     else
     {
-        std::cerr << "This user is not a member of this group." << std::endl;
+        LogError("This user is not a member of this group.");
         mysql_free_result(result);
         return 3;
     }
@@ -673,7 +673,7 @@ int sql_cancel_manager(MYSQL* connect, const char* my_email, const char* email, 
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -681,7 +681,7 @@ int sql_cancel_manager(MYSQL* connect, const char* my_email, const char* email, 
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -705,7 +705,7 @@ int if_manager(MYSQL* connect, const char* email, const char* group_name)//0代�
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -725,7 +725,7 @@ int sql_kick_anybody(MYSQL* connect, const char* my_email, const char* email, co
         // 检查是否踢除自己
     if (strcmp(my_email, email) == 0) 
     {
-        std::cerr << "Error: Cannot kick yourself." << std::endl;
+        LogError("Cannot kick yourself.");
         return 2;
     }
 
@@ -744,7 +744,7 @@ int sql_kick_anybody(MYSQL* connect, const char* my_email, const char* email, co
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -752,7 +752,7 @@ int sql_kick_anybody(MYSQL* connect, const char* my_email, const char* email, co
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -776,7 +776,7 @@ int sql_kick_normal(MYSQL* connect, const char* my_email, const char* email, con
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -784,7 +784,7 @@ int sql_kick_normal(MYSQL* connect, const char* my_email, const char* email, con
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -809,7 +809,7 @@ int sql_display_group_member(MYSQL* connect, const char* my_email, const char* g
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -821,7 +821,7 @@ int sql_display_group_member(MYSQL* connect, const char* my_email, const char* g
     }
     else
     {
-        std::cerr << "You are not a member of this group." << std::endl;
+        LogError("You are not a member of this group.");
         mysql_free_result(result);
         return 2;
     }
@@ -830,7 +830,7 @@ int sql_display_group_member(MYSQL* connect, const char* my_email, const char* g
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -865,7 +865,7 @@ int sql_display_group_member_without_request(MYSQL* connect, const char* my_emai
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error1: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 
@@ -877,7 +877,7 @@ int sql_display_group_member_without_request(MYSQL* connect, const char* my_emai
     }
     else
     {
-        std::cerr << "You are not a member of this group." << std::endl;
+        LogError("You are not a member of this group.");
         mysql_free_result(result);
         return 2;
     }
@@ -886,7 +886,7 @@ int sql_display_group_member_without_request(MYSQL* connect, const char* my_emai
 
     if(mysql_query(connect, query.c_str()))
     {
-        std::cerr << "Error2: " << mysql_error(connect) << std::endl;
+        LogError("{}", mysql_error(connect));
         return 0;
     }
 

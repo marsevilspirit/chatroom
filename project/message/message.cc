@@ -26,12 +26,13 @@ static int writen(int fd, const char* msg, int size)
         {
             if(errno == EPIPE || errno == ECONNRESET)
             {
-                printf("Network connection reset or broken.\n");
+                LogError("网络连接重置或中断");
+                close(fd);
                 return -1;
             }
             else
             {
-                perror("send");
+                LogError("send func error");
                 close(fd);
                 return -1;
             }
@@ -58,7 +59,7 @@ int sendMsg(int cfd, const char* msg, int len, Type flag)
     char* data = (char*)malloc(len + 8); // 4字节用于存放长度，4字节用于存放标志
     if (data == nullptr)
     {
-        perror("malloc");
+        LogError("malloc func error");
         return -1;
     }
 
@@ -104,7 +105,7 @@ int recvMsg(int cfd, char** msg, Type* flag)
     int len = 0;
     if (readn(cfd, (char*)&len, 4) == -1) 
     {
-        std::cout << "len: " << len << '\n';
+        LogTrace("len: {}", len);
         return -1;
     }
 
@@ -140,7 +141,7 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     FILE* file = fopen(file_path, "rb");
     if (!file)
     {
-        perror("fopen");
+        LogError("没有找到文件{} 或文件打开失败", file_path);
         return -1;
     }
 
@@ -160,7 +161,7 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
     char* buffer = (char*)malloc(msgSize);
     if (!buffer)
     {
-        perror("malloc");
+        LogError("malloc func error");
         fclose(file);
         return -1;
     }
@@ -193,7 +194,7 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
         return ret;
     }
 
-    std::cout << "文件上传中" << '\n';
+    LogInfo("文件上传中");
 
     while (fileSize > 0)
     {
@@ -224,7 +225,7 @@ int sendFile(int cfd, const char* file_name, const char* file_path, const char* 
         fileSize -= block_size;
     }
 
-    std::cout << "文件上传完成" << '\n';
+    LogInfo("文件上传成功");
 
     fclose(file);
     free(buffer);
@@ -237,7 +238,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
     FILE* file = fopen(file_path, "rb");
     if (!file)
     {
-        perror("fopen");
+        LogError("没有找到文件{}或文件打开失败", file_path);
         return -1;
     }
 
@@ -257,7 +258,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
     char* buffer = (char*)malloc(msgSize);
     if (!buffer)
     {
-        perror("malloc");
+        LogError("malloc func error");
         fclose(file);
         return -1;
     }
@@ -286,7 +287,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
         return ret;
     }
 
-    std::cout << "文件传输中" << '\n';
+    LogInfo("文件传输中");
 
     while(fileSize > 0)
     {
@@ -315,7 +316,7 @@ int sendFile(int cfd, const char* file_path, const char* to_file_path)
         //std::cout << "(while)fileSize: " << fileSize << '\n';
     }
 
-    std::cout << "文件传输完成" << '\n';
+    LogInfo("文件传输完成");
 
     fclose(file);
     free(buffer);
@@ -330,7 +331,7 @@ int sendFile(int cfd, const char* file_path)
     FILE* file = fopen(file_path, "rb");
     if (!file)
     {
-        perror("fopen");
+        LogError("没有找到文件{}或文件打开失败", file_path);
         return -1;
     }
 
@@ -341,7 +342,7 @@ int sendFile(int cfd, const char* file_path)
     char* buffer = (char*)malloc(fileSize);
     if (!buffer)
     {
-        perror("malloc");
+        LogError("malloc func error");
         fclose(file);
         return -1;
     }
@@ -349,7 +350,7 @@ int sendFile(int cfd, const char* file_path)
     fread(buffer, 1, fileSize, file);
     fclose(file);
 
-    std::cout << "buffer: \n" << buffer << '\n';
+    LogTrace("buffer: \n{}", buffer);
 
     int ret = sendMsg(cfd, buffer, fileSize, SEND_FILE);
 
@@ -364,7 +365,7 @@ int recvFile(int cfd, char* buffer, int ret, const char* file_path)
     FILE* file = fopen(file_path, "wb");
     if (!file)
     {
-        perror("fopen");
+        LogError("没有找到文件{}或文件打开失败", file_path);
         free(buffer);
         return -1;
     }
@@ -381,7 +382,7 @@ int recvFile_long(int cfd, char* buffer, int ret, const char* file_path)
     FILE* file = fopen(file_path, "ab");
     if (!file)
     {
-        perror("fopen");
+        LogError("没有找到文件{}或文件打开失败", file_path);
         free(buffer);
         return -1;
     }
@@ -404,7 +405,7 @@ void handleOffline(MYSQL* connect, int client_socket)
 
     if(sql_display_friend(connect, email.c_str(), friend_list) == 0)
     {
-        std::cerr << "fail to get friend list\n";
+        LogError("获取好友列表失败");
         return;
     }
 
@@ -597,6 +598,7 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
     std::string email = j["email"];
     std::string password = j["passwd"];
 
+    LogInfo( "用户{}想要删除账号", email);
 
     std::string send;
 
@@ -632,7 +634,7 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
 
     if(sql_delete_list(connect, email.c_str()) == 0)
     {
-        std::cerr << "fail to delete table\n";
+        LogError("删除列表失败");
         send = "删除列表失败";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
@@ -640,7 +642,7 @@ void ServerhandleDeleteAccount(char* msg, int client_socket, MYSQL* connect)
 
     if(sql_delete_group_list(connect, email.c_str()) == 0)
     {
-        std::cerr << "fail to delete group table\n";
+        LogInfo("删除群组列表失败");
         send = "删除群组列表失败";
         sendMsg(client_socket, send.c_str(), send.size(), SERVER_MESSAGE);
         return;
@@ -654,10 +656,9 @@ void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to add friend: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* friend_email = msg;
+
+    LogInfo("用户{}想要添加用户{}好友", email, friend_email);
 
     int friend_fd = find_key_by_value(hashTable, friend_email);
 
@@ -700,7 +701,6 @@ void ServerhandleAddFriend(char* msg, int client_socket, MYSQL* connect)
 
     if(!is_your_friend_or_request(connect, email.c_str(), friend_email))
     {
-        std::cout << "send request------------------------------------\n";
         sql_request(connect, email.c_str(), friend_email);//好友申请
     }
 
@@ -712,10 +712,9 @@ void ServerhandleDeleteFriend(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to delete friend: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* friend_email = msg;
+
+    LogInfo( "用户{}想要删除用户{}好友", email, friend_email);
 
     std::string send;
 
@@ -742,10 +741,9 @@ void ServerhandleBlockFriend(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to block friend: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* friend_email = msg;
+
+    LogInfo("用户{}想要屏蔽用户{}", email, friend_email);
 
     std::string send;
 
@@ -764,10 +762,9 @@ void ServerhandleUnblockFriend(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to unblock friend: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* friend_email = msg;
+
+    LogInfo("用户{}想要解除屏蔽用户{}", email, friend_email);
 
     std::string send;
 
@@ -794,7 +791,7 @@ void ServerhandleDisplayFriend(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to display friend: " << client_socket << '\n'; 
+    LogInfo("用户{}想要查看好友列表", email);
 
     std::string send;
 
@@ -812,9 +809,6 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
 {
     std::string from_email = hashTable[client_socket];
 
-    std::cout << "user want to send private message: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* to_email = msg;
 
     while(*msg != ' ' && *msg != '\0')
@@ -823,6 +817,8 @@ void ServerhandlePrivateMessage(char* msg, int client_socket, MYSQL* connect)
     *msg = '\0';
     msg++;
     char* message = msg;
+
+    LogInfo("用户{}想要发送私聊消息给用户{}", from_email, to_email);
 
     //在message后加上发送时间
     time_t now = time(0);
@@ -918,10 +914,9 @@ void ServerhandleCreateGroup(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to create group: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* group_name = msg;
+
+    LogInfo("用户{}想要创建群组{}", email, group_name);
 
     std::string send;
 
@@ -940,10 +935,9 @@ void ServerhandleDeleteGroup(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to delete group: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* group_name = msg;
+
+    LogInfo("用户{}想要删除群组{}", email, group_name);
 
     std::string send;
 
@@ -970,10 +964,9 @@ void ServerhandleRequestJoinGroup(char* msg, int client_socket, MYSQL* connect)
 {
     std::string my_email = hashTable[client_socket];
 
-    std::cout << "user want to join group: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* group_name = msg;
+
+    LogInfo("用户{}想要加入群组{}", my_email, group_name);
 
     std::string send;
 
@@ -1006,10 +999,9 @@ void ServerhandleExitGroup(char* msg, int client_socket, MYSQL* connect)
 {
     std::string my_email = hashTable[client_socket];
 
-    std::cout << "user want to exit group: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* group_name = msg;
+
+    LogInfo("用户{}想要退出群组{}", my_email, group_name);
 
     std::string send;
 
@@ -1034,8 +1026,7 @@ void ServerhandleExitGroup(char* msg, int client_socket, MYSQL* connect)
 
 void ServerhandleDisplayGroupList(int client_socket, MYSQL* connect)
 {
-
-    std::cout << "user want to display group list: " << client_socket << '\n'; 
+    LogInfo("用户{}想要查看群组列表", hashTable[client_socket]);
 
     std::string send;
 
@@ -1055,8 +1046,7 @@ void ServerhandleDisplayRequestList(char* msg, int client_socket, MYSQL* connect
 
     char* group_name = msg;
 
-    std::cout << "user want to display request list: " << client_socket << '\n';
-    std::cout << group_name << '\n';
+    LogInfo("用户{}想要查看群组{}请求列表", my_email, group_name);
 
     std::string send;
 
@@ -1082,12 +1072,11 @@ void ServerhandleSetManager(char* msg, int  client_socket, MYSQL* connect)
 {
     std::string my_email = hashTable[client_socket];
 
-    std::cout << "user want to set manager: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string email = j["email"];
     std::string group_name = j["group_name"];
+
+    LogInfo("用户{}想要设置用户{}为群组{}管理员", my_email, email, group_name);
 
     std::string send;
 
@@ -1114,12 +1103,11 @@ void ServerhandleAddGroup(char* msg, int client_socket, MYSQL* connect)
 {
     std::string my_email = hashTable[client_socket];
 
-    std::cout << "user want to add people in group: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string group_name = j["group_name"];
     std::string email = j["email"];
+
+    LogInfo("用户{}将用户{}加入群组{}", my_email, email, group_name);
 
     std::string send;
 
@@ -1152,13 +1140,11 @@ void ServerhandleCancelManager(char* msg, int client_socket, MYSQL* connect)
 {
     std::string my_email = hashTable[client_socket];
 
-    std::cout << "user want to cancel manager: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string group_name = j["group_name"];
     std::string email = j["email"];
 
+    LogInfo("用户{}想要取消用户{}群组{}管理员", my_email, email, group_name);
 
     std::string send;
 
@@ -1193,12 +1179,11 @@ void ServerhandleKickSomebody(char* msg, int client_socket, MYSQL* connect)
     std::string my_email = hashTable[client_socket];
     int ret;
 
-    std::cout << "user want to kick somebody: " << client_socket << '\n';
-    std::cout << msg << '\n';
-
     nlohmann::json j = nlohmann::json::parse(std::string(msg));
     std::string group_name = j["group_name"];
     std::string email = j["email"];
+
+    LogInfo("用户{}想要踢用户{}出群组{}", my_email, email, group_name);
 
     std::string send;
 
@@ -1265,10 +1250,9 @@ void ServerhandleDisplayGroupMember(char* msg, int client_socket, MYSQL* connect
 {
     std::string my_email = hashTable[client_socket];
 
-    std::cout << "user want to display group member: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* group_name = msg;
+
+    LogInfo("用户{}想要查看群组{}成员", my_email, group_name);
 
     std::string send;
 
@@ -1293,9 +1277,9 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 {
     std::string my_email = hashTable[client_socket];
 
-    std::cout << "user want to send group message: " << client_socket << '\n'; 
-
     char* group_name = msg;
+
+    LogInfo("用户{}想要发送群组{}消息", my_email, group_name);
 
     while(*msg != ' ' && *msg != '\0')
         msg++;
@@ -1306,7 +1290,7 @@ void ServerhandleGroupMessage(char* msg, int client_socket, MYSQL* connect)
 
     char* message = msg;
 
-    std::cout << "group_name: " << group_name << " message: " << message << '\n';
+    LogTrace("group_name: {}, message: {}", group_name, message);
 
     //在message后加上发送时间
     time_t now = time(0);
@@ -1355,8 +1339,6 @@ void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
 {
     std::string sender = hashTable[client_socket];
 
-    std::cout << "user want to send file: " << client_socket << '\n'; 
-
     char* file_name = msg;
 
     while(*msg != ' ' && *msg != '\0')
@@ -1373,9 +1355,7 @@ void ServerhandleSendFile(char* msg, int len, int client_socket, MYSQL* connect)
     *msg = '\0';
     msg++;
 
-    std::cout << "file_name: " << file_name << '\n';
-    std::cout << "resver: " << resver << '\n';
-
+    LogInfo("用户{}想要发送文件{}给{}", sender, file_name, resver);
 
     size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
 
@@ -1398,8 +1378,6 @@ void ServerhandleSendFile_long(char* msg, int len, int client_socket, MYSQL* con
 {
     std::string sender = hashTable[client_socket];
 
-    std::cout << "user want to send file_long: " << client_socket << '\n'; 
-
     char* file_name = msg;
 
     while(*msg != ' ' && *msg != '\0')
@@ -1416,8 +1394,7 @@ void ServerhandleSendFile_long(char* msg, int len, int client_socket, MYSQL* con
     *msg = '\0';
     msg++;
 
-    std::cout << "file_name: " << file_name << '\n';
-    std::cout << "resver: " << resver << '\n';
+    LogInfo("用户{}想要发送文件{}给{}", sender, file_name, resver);
 
 
     size_t msgSize = len - strlen(file_name) - strlen(resver) - 2; // 加上空格的大小
@@ -1432,8 +1409,7 @@ void ServerhandleCheckFile(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to check file: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
+    LogInfo("用户{}想要查看文件列表", email);
 
     std::string send;
 
@@ -1491,10 +1467,9 @@ void ServerhandleFriendHistory(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to check friend history: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
-
     char* friend_email = msg;
+
+    LogInfo("用户{}想要查看与{}的聊天记录", email, friend_email);
 
     std::string send;
 
@@ -1512,10 +1487,9 @@ void ServerhandleGroupHistory(char* msg, int client_socket, MYSQL* connect)
 {
     std::string email = hashTable[client_socket];
 
-    std::cout << "user want to check group history: " << client_socket << '\n';
-    std::cout << msg << '\n';
-
     char* group_name = msg;
+
+    LogInfo("用户{}想要查看群组{}的聊天记录", email, group_name);
 
     std::string send;
 
@@ -1529,7 +1503,8 @@ void ServerhandleHeartBeat(char* msg, int client_socket)
     std::string email = hashTable[client_socket];
 
     std::cout << "user want to send heart beat: " << client_socket << '\n'; 
-    std::cout << msg << '\n';
+
+    LogTrace("用户{}发送心跳包", email);
 
     std::string send = "心跳包";
 

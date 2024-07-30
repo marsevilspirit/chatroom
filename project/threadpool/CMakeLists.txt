@@ -1,7 +1,7 @@
 # 添加 threadpool 目标及其源文件
 add_library(threadpool
-    threadpool.cc
     threadpool.h
+    threadpool.cc
 )
 
 # 设置头文件路径（如果有头文件的话）

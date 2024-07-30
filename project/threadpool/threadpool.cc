@@ -1,8 +1,7 @@
 #include "threadpool.h"
 
-threadpool::threadpool(int num):stop(false)
-{
-    for(int i = 0; i < num; ++i)
+threadpool::threadpool(size_t threads) : stop(false) {
+    for(int i = 0; i < threads; i++)
     {
         workers.emplace_back([this]{
                 while(true)
@@ -10,25 +9,30 @@ threadpool::threadpool(int num):stop(false)
                     std::function<void()> task;
 
                     {
-                        std::unique_lock<std::mutex> lock(queue_mutex);
-                        condition.wait(lock, [this]{return stop | !tasks.empty();});
-                        if(stop && tasks.empty())
+                        std::unique_lock<std::mutex> queue_lock(this->queue_mutex);
+                        this->if_tasks_pop.wait(queue_lock, [this]{return this->stop || !this->tasks.empty();});
+                        if(this->stop && this->tasks.empty())
                             return;
-                        task = std::move(tasks.front());
+
+                        task = std::move(this->tasks.front());
                         tasks.pop();
                     }
 
                     task();
                 }
-                });
+                });        
     }
 }
 
-threadpool::~threadpool()
-{
-    stop = true;
-    condition.notify_all();
+threadpool::~threadpool() {
+    {
+        std::unique_lock<std::mutex> queue_lock(queue_mutex);
+        stop = true;
+    }
 
-    for(auto& worker : workers)
-       worker.join();
-} 
+    if_tasks_pop.notify_all();
+    for(std::thread &worker : workers)
+    {
+        worker.join();
+    }
+}

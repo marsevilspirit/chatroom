@@ -20,12 +20,11 @@ add_executable(client
     project/client/client_menu.cc
     project/client/mail.cc
     project/client/command_menu.cc
-    project/threadpool/threadpool.cc
 )
 
 target_link_libraries(chatroom server)
 
-target_link_libraries(client message -lesmtp -lssl -lcrypto)
+target_link_libraries(client message threadpool -lesmtp -lssl -lcrypto)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
